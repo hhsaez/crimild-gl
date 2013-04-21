@@ -27,6 +27,7 @@
 
 #include "GLSimulation.hpp"
 #include "Tasks/WindowTask.hpp"
+#include "Rendering/GLFWRenderer.hpp"
 
 #include <GL/glfw.h>
 
@@ -35,14 +36,22 @@ using namespace Crimild;
 GLSimulation::GLSimulation( std::string name )
 	: Simulation( name )
 {
-	glfwInit();
-
-	WindowTaskPtr windowTask( new WindowTask( 99999 ) );
-	getMainLoop()->startTask( windowTask );
 }
 
 GLSimulation::~GLSimulation( void )
 {
 
+}
+
+void GLSimulation::start( void ) 
+{
+	if ( !glfwInit() ) {
+		throw RuntimeException( "Cannot start GLFW: glwfInit failed!" );
+	}
+
+	WindowTaskPtr windowTask( new WindowTask( 99999, 1280, 720 ) );
+	getMainLoop()->startTask( windowTask );
+
+	Simulation::start();
 }
 

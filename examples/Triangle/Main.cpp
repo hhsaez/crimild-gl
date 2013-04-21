@@ -28,9 +28,33 @@
 #include <Crimild.hpp>
 #include <CrimildGL.hpp>
 
+using namespace Crimild;
+
 int main( int argc, char **argv )
 {
-	Crimild::SimulationPtr sim( new Crimild::GLSimulation( "test" ) );
+	float vertices[] = {
+		-1.0f, -1.0f, 0.0f,
+		1.0f, -1.0f, 0.0f,
+		0.0f, 1.0f, 0.0
+	};
+
+
+	unsigned short indices[] = {
+		0, 1, 2
+	};
+
+	VertexBufferObjectPtr vbo( new VertexBufferObject( VertexFormat::VF_P3, 3, vertices ) );
+	IndexBufferObjectPtr ibo( new IndexBufferObject( 3, indices ) );
+	
+	PrimitivePtr primitive( new Primitive( Primitive::Type::TRIANGLES ) );
+	primitive->setVertexBuffer( vbo );
+	primitive->setIndexBuffer( ibo );
+
+	GeometryNodePtr geometry( new GeometryNode() );
+	geometry->attachPrimitive( primitive );
+
+	SimulationPtr sim( new GLSimulation( "test" ) );
+	sim->attachScene( geometry );
 	return sim->run();
 }
 

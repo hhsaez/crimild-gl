@@ -34,7 +34,7 @@ namespace Crimild {
 
 	class WindowTask : public Task {
 	public:
-		WindowTask( int priority );
+		WindowTask( int priority, int width, int height );
 		virtual ~WindowTask( void );
 
 		virtual void start( void ) override;

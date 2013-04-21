@@ -25,53 +25,41 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "WindowTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
+#include "GLFWRenderer.hpp"
 
 #include <GL/glfw.h>
 
 using namespace Crimild;
 
-WindowTask::WindowTask( int priority, int width, int height )
-	: Task( priority )
+GLFWRenderer::GLFWRenderer( FrameBufferObjectPtr screenBuffer )
 {
+	setScreenBuffer( screenBuffer );
 }
 
-WindowTask::~WindowTask( void )
-{
-
-}
-
-void WindowTask::start( void )
-{
-	FrameBufferObjectPtr screenBuffer( new FrameBufferObject( 1280, 720 ) );
-	screenBuffer->setClearColor( RGBAColorf( 0.5f, 0.5f, 0.5f, 1.0f ) );
-
-    glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-    glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
-    glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 2 );
-    glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, GL_TRUE );
-
-    if ( !glfwOpenWindow( screenBuffer->getWidth(), screenBuffer->getHeight(), 8, 8, 8, 8, 0, 0, GLFW_WINDOW ) ) {
-    	throw RuntimeException( "Cannot created main window. Does your hardware support OpenGL 3.2?" );
-    }
-
-	GLFWRendererPtr renderer( new GLFWRenderer( screenBuffer ) );
-	Simulation::getCurrent()->setRenderer( renderer );
-}
-
-void WindowTask::stop( void )
+GLFWRenderer::~GLFWRenderer( void )
 {
 
 }
 
-void WindowTask::update( void )
+void GLFWRenderer::configure( void )
 {
-	if ( glfwGetWindowParam( GLFW_OPENED ) ) {
-		glfwSwapBuffers();
-	}
-	else {
-		Simulation::getCurrent()->stop();
-	}
+
+}
+
+void GLFWRenderer::beginRender( void )
+{
+
+}
+
+void GLFWRenderer::endRender( void )
+{
+
+}
+
+void GLFWRenderer::clearBuffers( void )
+{
+	const RGBAColorf &clearColor = getScreenBuffer()->getClearColor();
+	glClearColor( clearColor.r(), clearColor.g(), clearColor.b(), clearColor.a() );
+	glClear( GL_COLOR_BUFFER_BIT );
 }
 

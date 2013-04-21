@@ -37,6 +37,8 @@ namespace Crimild {
 		GLSimulation( std::string name );
 		virtual ~GLSimulation( void );
 
+		virtual void start( void ) override;
+
 	};
 
 }

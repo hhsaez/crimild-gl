@@ -25,53 +25,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "WindowTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
+#ifndef CRIMILD_GLFW_RENDERER_RENDERER_
+#define CRIMILD_GLFW_RENDERER_RENDERER_
 
-#include <GL/glfw.h>
+#include <Crimild.hpp>
 
-using namespace Crimild;
+namespace Crimild {
 
-WindowTask::WindowTask( int priority, int width, int height )
-	: Task( priority )
-{
-}
+	class GLFWRenderer : public Renderer {
+	public:
+		GLFWRenderer( FrameBufferObjectPtr screenBuffer );
+		virtual ~GLFWRenderer( void );
 
-WindowTask::~WindowTask( void )
-{
+		virtual void configure( void ) override;
 
-}
+		virtual void beginRender( void ) override;
+		
+		virtual void endRender( void ) override;
 
-void WindowTask::start( void )
-{
-	FrameBufferObjectPtr screenBuffer( new FrameBufferObject( 1280, 720 ) );
-	screenBuffer->setClearColor( RGBAColorf( 0.5f, 0.5f, 0.5f, 1.0f ) );
+		virtual void clearBuffers( void ) override;
+	};
 
-    glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-    glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
-    glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 2 );
-    glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, GL_TRUE );
-
-    if ( !glfwOpenWindow( screenBuffer->getWidth(), screenBuffer->getHeight(), 8, 8, 8, 8, 0, 0, GLFW_WINDOW ) ) {
-    	throw RuntimeException( "Cannot created main window. Does your hardware support OpenGL 3.2?" );
-    }
-
-	GLFWRendererPtr renderer( new GLFWRenderer( screenBuffer ) );
-	Simulation::getCurrent()->setRenderer( renderer );
-}
-
-void WindowTask::stop( void )
-{
+	typedef std::shared_ptr< GLFWRenderer > GLFWRendererPtr;
 
 }
 
-void WindowTask::update( void )
-{
-	if ( glfwGetWindowParam( GLFW_OPENED ) ) {
-		glfwSwapBuffers();
-	}
-	else {
-		Simulation::getCurrent()->stop();
-	}
-}
+#endif
 
