@@ -25,33 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GLSimulation.hpp"
-#include "Tasks/WindowTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
-
-#include <GL/glfw.h>
+#include "ScreenShaderProgram.hpp"
 
 using namespace Crimild;
 
-GLSimulation::GLSimulation( std::string name )
-	: Simulation( name )
-{
+const char *screen_vs = "attribute vec3 position; void main(void) { gl_Position = vec4(position.x, position.y, 0.0, 1.0); }";
+const char *screen_fs = "void main(void) { gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0 ); }";
+
+ScreenShaderProgram::ScreenShaderProgram( void )
+	: ShaderProgram( VertexShaderPtr( new VertexShader( screen_vs ) ), FragmentShaderPtr( new FragmentShader( screen_fs ) ) )
+{ 
 }
 
-GLSimulation::~GLSimulation( void )
-{
-	glfwTerminate();
-}
-
-void GLSimulation::start( void ) 
-{
-	if ( !glfwInit() ) {
-		throw RuntimeException( "Cannot start GLFW: glwfInit failed!" );
-	}
-
-	WindowTaskPtr windowTask( new WindowTask( 99999, 1280, 720 ) );
-	getMainLoop()->startTask( windowTask );
-
-	Simulation::start();
+ScreenShaderProgram::~ScreenShaderProgram( void )
+{ 
 }
 

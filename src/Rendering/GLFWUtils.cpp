@@ -25,33 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GLSimulation.hpp"
-#include "Tasks/WindowTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
+#include "GLFWUtils.hpp"
 
 #include <GL/glfw.h>
 
+#include <iostream>
+
 using namespace Crimild;
 
-GLSimulation::GLSimulation( std::string name )
-	: Simulation( name )
+void GLFWUtils::checkErrors( std::string prefix )
 {
-}
-
-GLSimulation::~GLSimulation( void )
-{
-	glfwTerminate();
-}
-
-void GLSimulation::start( void ) 
-{
-	if ( !glfwInit() ) {
-		throw RuntimeException( "Cannot start GLFW: glwfInit failed!" );
-	}
-
-	WindowTaskPtr windowTask( new WindowTask( 99999, 1280, 720 ) );
-	getMainLoop()->startTask( windowTask );
-
-	Simulation::start();
+    for ( GLint error = glGetError(); error; error = glGetError() ) {
+        std::cout << prefix << " (0x" << error << ")" << std::endl;
+    }
 }
 

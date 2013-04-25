@@ -25,33 +25,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GLSimulation.hpp"
-#include "Tasks/WindowTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
+#ifndef CRIMILD_GLFW_SHADER_PROGRAM_CATALOG_
+#define CRIMILD_GLFW_SHADER_PROGRAM_CATALOG_
 
-#include <GL/glfw.h>
+#include <Crimild.hpp>
 
-using namespace Crimild;
+namespace Crimild {
 
-GLSimulation::GLSimulation( std::string name )
-	: Simulation( name )
-{
+	class GLFWShaderProgramCatalog : public Catalog< ShaderProgram > {
+	public:
+		GLFWShaderProgramCatalog( void );
+		virtual ~GLFWShaderProgramCatalog( void );
+
+		virtual int getNextResourceId( void ) override;
+
+		virtual void bind( ShaderProgram *program ) override;
+		virtual void unbind( ShaderProgram *program ) override;
+
+		virtual void load( ShaderProgram *program ) override;
+		virtual void unload( ShaderProgram *program ) override;
+
+	private:
+		int compileShader( Shader *shader, int type );
+
+		void fetchAttributeLocation( ShaderProgram *program, ShaderLocation *location );
+		void fetchUniformLocation( ShaderProgram *program, ShaderLocation *location );
+	};
+
 }
 
-GLSimulation::~GLSimulation( void )
-{
-	glfwTerminate();
-}
-
-void GLSimulation::start( void ) 
-{
-	if ( !glfwInit() ) {
-		throw RuntimeException( "Cannot start GLFW: glwfInit failed!" );
-	}
-
-	WindowTaskPtr windowTask( new WindowTask( 99999, 1280, 720 ) );
-	getMainLoop()->startTask( windowTask );
-
-	Simulation::start();
-}
+#endif
 

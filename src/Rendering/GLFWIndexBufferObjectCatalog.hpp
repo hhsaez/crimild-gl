@@ -25,33 +25,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GLSimulation.hpp"
-#include "Tasks/WindowTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
+#ifndef CRIMILD_GLFW_INDEX_BUFFER_OBJECT_CATALOG_
+#define CRIMILD_GLFW_INDEX_BUFFER_OBJECT_CATALOG_
 
-#include <GL/glfw.h>
+#include <Crimild.hpp>
 
-using namespace Crimild;
+namespace Crimild {
 
-GLSimulation::GLSimulation( std::string name )
-	: Simulation( name )
-{
+	class GLFWIndexBufferObjectCatalog : public Catalog< IndexBufferObject > {
+	public:
+		GLFWIndexBufferObjectCatalog( void );
+		virtual ~GLFWIndexBufferObjectCatalog( void );
+
+		virtual int getNextResourceId( void ) override;
+
+		virtual void bind( ShaderProgram *program, IndexBufferObject *ibo ) override;
+		virtual void unbind( ShaderProgram *program, IndexBufferObject *ibo ) override;
+
+		virtual void load( IndexBufferObject *ibo ) override;
+		virtual void unload( IndexBufferObject *ibo ) override;
+	};
+
 }
 
-GLSimulation::~GLSimulation( void )
-{
-	glfwTerminate();
-}
-
-void GLSimulation::start( void ) 
-{
-	if ( !glfwInit() ) {
-		throw RuntimeException( "Cannot start GLFW: glwfInit failed!" );
-	}
-
-	WindowTaskPtr windowTask( new WindowTask( 99999, 1280, 720 ) );
-	getMainLoop()->startTask( windowTask );
-
-	Simulation::start();
-}
+#endif
 

@@ -25,33 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GLSimulation.hpp"
-#include "Tasks/WindowTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
-
-#include <GL/glfw.h>
+#include "SimpleShaderProgram.hpp"
 
 using namespace Crimild;
 
-GLSimulation::GLSimulation( std::string name )
-	: Simulation( name )
-{
+const char *simple_vs = "attribute vec3 position; uniform mat4 projMatrix; uniform mat4 viewMatrix; uniform mat4 modelMatrix; varying vec4 color; void main(void) { vec4 mp = modelMatrix * vec4(position, 1.0); color = vec4(0.5 + 0.5 * mp.x, 0.5 + 0.5 * mp.y, 0.5 + 0.5 * mp.z, 1.0); gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0); }";
+const char *simple_fs = "varying vec4 color; void main(void) { gl_FragColor = color; }";
+
+SimpleShaderProgram::SimpleShaderProgram( void )
+	: ShaderProgram( VertexShaderPtr( new VertexShader( simple_vs ) ), FragmentShaderPtr( new FragmentShader( simple_fs ) ) )
+{ 
 }
 
-GLSimulation::~GLSimulation( void )
-{
-	glfwTerminate();
-}
-
-void GLSimulation::start( void ) 
-{
-	if ( !glfwInit() ) {
-		throw RuntimeException( "Cannot start GLFW: glwfInit failed!" );
-	}
-
-	WindowTaskPtr windowTask( new WindowTask( 99999, 1280, 720 ) );
-	getMainLoop()->startTask( windowTask );
-
-	Simulation::start();
+SimpleShaderProgram::~SimpleShaderProgram( void )
+{ 
 }
 

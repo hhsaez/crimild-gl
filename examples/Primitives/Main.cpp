@@ -25,33 +25,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GLSimulation.hpp"
-#include "Tasks/WindowTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
-
-#include <GL/glfw.h>
+#include <Crimild.hpp>
+#include <CrimildGL.hpp>
 
 using namespace Crimild;
 
-GLSimulation::GLSimulation( std::string name )
-	: Simulation( name )
+int main( int argc, char **argv )
 {
-}
+	GeometryNodePtr geometry( new GeometryNode() );
+	PrimitivePtr primitive( new NewellTeapotPrimitive() );
+	geometry->attachPrimitive( primitive );
+	geometry->local().setTranslate( 0.0f, -0.65f, -3.0f );
+	geometry->local().setScale( 0.05f );
+	RotationComponentPtr rotationComponent( new RotationComponent( Vector3f( 0, 1, 0 ), 0.25 ) );
+	geometry->attachComponent( rotationComponent );
 
-GLSimulation::~GLSimulation( void )
-{
-	glfwTerminate();
-}
+	GroupNodePtr scene( new GroupNode() );
+	scene->attachNode( geometry );
 
-void GLSimulation::start( void ) 
-{
-	if ( !glfwInit() ) {
-		throw RuntimeException( "Cannot start GLFW: glwfInit failed!" );
-	}
+	CameraNodePtr camera( new CameraNode() );
+	scene->attachNode( camera );
 
-	WindowTaskPtr windowTask( new WindowTask( 99999, 1280, 720 ) );
-	getMainLoop()->startTask( windowTask );
-
-	Simulation::start();
+	SimulationPtr sim( new GLSimulation( "The Infamus Teapot" ) );
+	sim->attachScene( scene );
+	return sim->run();
 }
 

@@ -41,9 +41,15 @@ namespace Crimild {
 
 		virtual void beginRender( void ) override;
 		
-		virtual void endRender( void ) override;
-
 		virtual void clearBuffers( void ) override;
+
+		virtual void applyTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera ) override;
+
+		virtual void drawPrimitive( ShaderProgram *program, Primitive *primitive ) override;
+
+		virtual void restoreTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera ) override;
+
+		virtual void endRender( void ) override;
 	};
 
 	typedef std::shared_ptr< GLFWRenderer > GLFWRendererPtr;

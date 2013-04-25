@@ -25,33 +25,62 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GLSimulation.hpp"
-#include "Tasks/WindowTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
+#include "GLFWIndexBufferObjectCatalog.hpp"
+
+#include "Exceptions/GLFWException.hpp"
 
 #include <GL/glfw.h>
 
 using namespace Crimild;
 
-GLSimulation::GLSimulation( std::string name )
-	: Simulation( name )
+GLFWIndexBufferObjectCatalog::GLFWIndexBufferObjectCatalog( void )
 {
+
 }
 
-GLSimulation::~GLSimulation( void )
+GLFWIndexBufferObjectCatalog::~GLFWIndexBufferObjectCatalog( void )
 {
-	glfwTerminate();
+
 }
 
-void GLSimulation::start( void ) 
+int GLFWIndexBufferObjectCatalog::getNextResourceId( void )
 {
-	if ( !glfwInit() ) {
-		throw RuntimeException( "Cannot start GLFW: glwfInit failed!" );
-	}
+    GLuint id;
+    glGenBuffers( 1, &id );
+    return id;
+}
 
-	WindowTaskPtr windowTask( new WindowTask( 99999, 1280, 720 ) );
-	getMainLoop()->startTask( windowTask );
+void GLFWIndexBufferObjectCatalog::bind( ShaderProgram *program, IndexBufferObject *ibo )
+{
+	Catalog< IndexBufferObject >::bind( program, ibo );
 
-	Simulation::start();
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo->getCatalogId() );
+}
+
+void GLFWIndexBufferObjectCatalog::unbind( ShaderProgram *program, IndexBufferObject *ibo )
+{
+	Catalog< IndexBufferObject >::unbind( program, ibo );
+
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+}
+
+void GLFWIndexBufferObjectCatalog::load( IndexBufferObject *ibo )
+{
+	Catalog< IndexBufferObject >::load( ibo );
+
+	int id = ibo->getCatalogId();
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, id );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, 
+		sizeof( unsigned short ) * ibo->getIndexCount(), 
+		ibo->getData(), 
+		GL_STATIC_DRAW );
+}
+
+void GLFWIndexBufferObjectCatalog::unload( IndexBufferObject *ibo )
+{
+	GLuint bufferId = ibo->getCatalogId();
+	glDeleteBuffers( 1, &bufferId );
+
+	Catalog< IndexBufferObject >::unload( ibo );
 }
 

@@ -26,6 +26,11 @@
  */
 
 #include "GLFWRenderer.hpp"
+#include "GLFWShaderProgramCatalog.hpp"
+#include "GLFWVertexBufferObjectCatalog.hpp"
+#include "GLFWIndexBufferObjectCatalog.hpp"
+#include "ShaderLibrary/SimpleShaderProgram.hpp"
+#include "GLFWUtils.hpp"
 
 #include <GL/glfw.h>
 
@@ -33,6 +38,15 @@ using namespace Crimild;
 
 GLFWRenderer::GLFWRenderer( FrameBufferObjectPtr screenBuffer )
 {
+	setShaderProgramCatalog( ShaderProgramCatalogPtr( new GLFWShaderProgramCatalog() ) );
+	setVertexBufferObjectCatalog( VertexBufferObjectCatalogPtr( new GLFWVertexBufferObjectCatalog() ) );
+	setIndexBufferObjectCatalog( IndexBufferObjectCatalogPtr( new GLFWIndexBufferObjectCatalog() ) );
+
+	MaterialPtr material( new Material() );
+	ShaderProgramPtr program( new SimpleShaderProgram() );
+	material->setProgram( program );
+	setDefaultMaterial( material );
+
 	setScreenBuffer( screenBuffer );
 }
 
@@ -43,7 +57,8 @@ GLFWRenderer::~GLFWRenderer( void )
 
 void GLFWRenderer::configure( void )
 {
-
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 }
 
 void GLFWRenderer::beginRender( void )
@@ -60,6 +75,74 @@ void GLFWRenderer::clearBuffers( void )
 {
 	const RGBAColorf &clearColor = getScreenBuffer()->getClearColor();
 	glClearColor( clearColor.r(), clearColor.g(), clearColor.b(), clearColor.a() );
-	glClear( GL_COLOR_BUFFER_BIT );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+}
+
+void GLFWRenderer::applyTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera )
+{
+	ShaderLocation *projMatrixLocation = program->getLocation( ShaderLocation::DefaultLocations::PROJECTION_MATRIX_UNIFORM_NAME );
+	if ( projMatrixLocation->isValid() ) {
+		glUniformMatrix4fv( projMatrixLocation->getLocation(), 1, GL_FALSE, static_cast< const float * >( camera->getProjectionMatrix() ) );
+	}
+
+	ShaderLocation *viewMatrixLocation = program->getLocation( ShaderLocation::DefaultLocations::VIEW_MATRIX_UNIFORM_NAME );
+	if ( viewMatrixLocation->isValid() ) {
+		glUniformMatrix4fv( viewMatrixLocation->getLocation(), 1, GL_FALSE, static_cast< const GLfloat * >( camera->getViewMatrix() ) );
+	}
+
+	ShaderLocation *modelMatrixLocation = program->getLocation( ShaderLocation::DefaultLocations::MODEL_MATRIX_UNIFORM_NAME );
+	if ( modelMatrixLocation->isValid() ) {
+		Matrix4f modelMatrix = geometry->getWorld().computeModelMatrix();
+		glUniformMatrix4fv( modelMatrixLocation->getLocation(), 1, GL_FALSE, static_cast< const GLfloat * >( modelMatrix ) );
+	}
+}
+
+void GLFWRenderer::drawPrimitive( ShaderProgram *program, Primitive *primitive )
+{
+	GLenum type;
+	switch ( primitive->getType() ) {
+		case Primitive::Type::POINTS:
+			type = GL_POINTS;
+			break;
+
+		case Primitive::Type::LINES:
+			type = GL_LINES;
+			break;
+			
+		case Primitive::Type::LINE_LOOP:
+			type = GL_LINE_LOOP;
+			break;
+			
+		case Primitive::Type::LINE_STRIP:
+			type = GL_LINE_STRIP;
+			break;
+			
+		case Primitive::Type::TRIANGLE_FAN:
+			type = GL_TRIANGLE_FAN;
+			break;
+			
+		case Primitive::Type::TRIANGLE_STRIP:
+			type = GL_TRIANGLE_STRIP;
+			break;
+			
+		case Primitive::Type::TRIANGLES:
+		default:
+			type = GL_TRIANGLES;
+			break;
+	}
+
+	unsigned short *base = 0;
+	glDrawElements( type,
+				   primitive->getIndexBuffer()->getIndexCount(),
+				   GL_UNSIGNED_SHORT,
+				   ( const GLvoid * ) base );
+	
+
+	CRIMILD_CHECK_GL_ERRORS_AFTER( GLFWRenderer::drawPrimitive );
+}
+
+void GLFWRenderer::restoreTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera )
+{
+
 }
 
