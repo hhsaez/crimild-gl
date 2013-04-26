@@ -50,6 +50,11 @@ namespace Crimild {
 		virtual void restoreTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera ) override;
 
 		virtual void endRender( void ) override;
+
+		virtual ShaderProgram *getFallbackProgram( Material *material ) override;
+
+	private:
+		std::map< std::string, ShaderProgramPtr > _fallbackPrograms;
 	};
 
 	typedef std::shared_ptr< GLFWRenderer > GLFWRendererPtr;

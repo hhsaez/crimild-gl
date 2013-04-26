@@ -29,7 +29,9 @@
 #include "GLFWShaderProgramCatalog.hpp"
 #include "GLFWVertexBufferObjectCatalog.hpp"
 #include "GLFWIndexBufferObjectCatalog.hpp"
+#include "GLFWTextureCatalog.hpp"
 #include "ShaderLibrary/SimpleShaderProgram.hpp"
+#include "ShaderLibrary/TextureShaderProgram.hpp"
 #include "GLFWUtils.hpp"
 
 #include <GL/glfw.h>
@@ -41,11 +43,15 @@ GLFWRenderer::GLFWRenderer( FrameBufferObjectPtr screenBuffer )
 	setShaderProgramCatalog( ShaderProgramCatalogPtr( new GLFWShaderProgramCatalog() ) );
 	setVertexBufferObjectCatalog( VertexBufferObjectCatalogPtr( new GLFWVertexBufferObjectCatalog() ) );
 	setIndexBufferObjectCatalog( IndexBufferObjectCatalogPtr( new GLFWIndexBufferObjectCatalog() ) );
+	setTextureCatalog( TextureCatalogPtr( new GLFWTextureCatalog() ) );
 
 	MaterialPtr material( new Material() );
 	ShaderProgramPtr program( new SimpleShaderProgram() );
 	material->setProgram( program );
 	setDefaultMaterial( material );
+
+	_fallbackPrograms[ "simple" ] = ShaderProgramPtr( new SimpleShaderProgram() );
+	_fallbackPrograms[ "texture" ] = ShaderProgramPtr( new TextureShaderProgram() );
 
 	setScreenBuffer( screenBuffer );
 }
@@ -144,5 +150,14 @@ void GLFWRenderer::drawPrimitive( ShaderProgram *program, Primitive *primitive )
 void GLFWRenderer::restoreTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera )
 {
 
+}
+
+ShaderProgram *GLFWRenderer::getFallbackProgram( Material *material )
+{
+	if ( material->getColorMap() ) {
+		return _fallbackPrograms[ "texture" ].get();
+	}
+
+	return _fallbackPrograms[ "simple" ].get();
 }
 

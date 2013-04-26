@@ -29,14 +29,44 @@
 
 #include <GL/glfw.h>
 
-#include <iostream>
-
 using namespace Crimild;
 
 void GLFWUtils::checkErrors( std::string prefix )
 {
     for ( GLint error = glGetError(); error; error = glGetError() ) {
-        std::cout << prefix << " (0x" << error << ")" << std::endl;
+
+    	std::string errorDescription;
+    	switch (error) {
+			case 1280:
+				errorDescription += "GL_INVALID_ENUM";
+				break;
+
+			case 1281:
+				errorDescription += "GL_INVALID_VALUE";
+				break;
+
+			case 1282:
+				errorDescription += "GL_INVALID_OPERATION";
+				break;
+
+			case 1283:
+				errorDescription += "GL_STACK_OVERFLOW";  
+				break;
+
+			case 1284: 
+				errorDescription += "GL_STACK_UNDERFLOW";
+				break;
+
+			case 1285: 
+				errorDescription += "GL_OUT_OF_MEMORY";
+				break;
+
+			default:
+				errorDescription += "Unknown Error";
+				break;
+    	}
+
+    	Log::Error << prefix << " " << errorDescription << " (0x" << error << ") " << Log::End; 
     }
 }
 

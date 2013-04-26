@@ -25,22 +25,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GLFW_RENDERING_UTILS_
-#define CRIMILD_GLFW_RENDERING_UTILS_
+#ifndef CRIMILD_GLFW_TEXTURE_CATALOG_
+#define CRIMILD_GLFW_TEXTURE_CATALOG_
 
 #include <Crimild.hpp>
 
 namespace Crimild {
 
-	class GLFWUtils {
+	class GLFWTextureCatalog : public Catalog< Texture > {
 	public:
-		static void checkErrors( std::string prefix );
+		GLFWTextureCatalog( void );
+		virtual ~GLFWTextureCatalog( void );
+
+		virtual int getNextResourceId( void ) override;
+
+		virtual void bind( ShaderProgram *program, Texture *texture ) override;
+		virtual void unbind( ShaderProgram *program, Texture *texture ) override;
+
+		virtual void load( Texture *texture ) override;
+		virtual void unload( Texture *texture ) override;
+
+	private:
+		int _boundTextureCount;
 	};
 
 }
-
-#define CRIMILD_CHECK_GL_ERRORS_BEFORE( OPERATION ) Crimild::GLFWUtils::checkErrors( std::string( "Error before " ) + #OPERATION );
-#define CRIMILD_CHECK_GL_ERRORS_AFTER( OPERATION ) Crimild::GLFWUtils::checkErrors( std::string( "Error after " ) + #OPERATION );
 
 #endif
 

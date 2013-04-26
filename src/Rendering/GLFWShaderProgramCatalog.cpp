@@ -51,20 +51,30 @@ int GLFWShaderProgramCatalog::getNextResourceId( void )
 
 void GLFWShaderProgramCatalog::bind( ShaderProgram *program )
 {
+    CRIMILD_CHECK_GL_ERRORS_BEFORE( "GLFWShaderProgramCatalog::bind" );
+
 	Catalog< ShaderProgram >::bind( program );
 
 	glUseProgram( program->getCatalogId() );
+
+    CRIMILD_CHECK_GL_ERRORS_AFTER( "GLFWShaderProgramCatalog::bind" );
 }
 
 void GLFWShaderProgramCatalog::unbind( ShaderProgram *program )
 {
+    CRIMILD_CHECK_GL_ERRORS_BEFORE( "GLFWShaderProgramCatalog::unbind" );
+
 	Catalog< ShaderProgram >::unbind( program );
 
 	glUseProgram( 0 );
+
+    CRIMILD_CHECK_GL_ERRORS_AFTER( "GLFWShaderProgramCatalog::unbind" );
 }
 
 void GLFWShaderProgramCatalog::load( ShaderProgram *program )
 {
+    CRIMILD_CHECK_GL_ERRORS_BEFORE( "GLFWShaderProgramCatalog::load" );
+
 	Catalog< ShaderProgram >::load( program );
 
 	int programId = program->getCatalogId();
@@ -113,16 +123,22 @@ void GLFWShaderProgramCatalog::load( ShaderProgram *program )
             });
         }
 	}
+
+    CRIMILD_CHECK_GL_ERRORS_AFTER( "GLFWShaderProgramCatalog::load" );
 }
 
 void GLFWShaderProgramCatalog::unload( ShaderProgram *program )
 {
+    CRIMILD_CHECK_GL_ERRORS_BEFORE( "GLFWShaderProgramCatalog::unload" );
+
 	int programId = program->getCatalogId();
 	if ( programId > 0 ) {
 		glDeleteProgram( programId );
 	}
 
 	Catalog< ShaderProgram >::unload( program );
+
+    CRIMILD_CHECK_GL_ERRORS_AFTER( "GLFWShaderProgramCatalog::unbind" );
 }
 
 int GLFWShaderProgramCatalog::compileShader( Shader *shader, int type )

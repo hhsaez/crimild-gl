@@ -25,22 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GLFW_RENDERING_UTILS_
-#define CRIMILD_GLFW_RENDERING_UTILS_
+#ifndef CRIMILD_GLFW_SHADER_LIBRARY_TEXTURE_
+#define CRIMILD_GLFW_SHADER_LIBRARY_TEXTURE_
 
 #include <Crimild.hpp>
 
 namespace Crimild {
 
-	class GLFWUtils {
+	class TextureShaderProgram : public ShaderProgram {
 	public:
-		static void checkErrors( std::string prefix );
+		TextureShaderProgram( void );
+		virtual ~TextureShaderProgram( void );
 	};
 
 }
-
-#define CRIMILD_CHECK_GL_ERRORS_BEFORE( OPERATION ) Crimild::GLFWUtils::checkErrors( std::string( "Error before " ) + #OPERATION );
-#define CRIMILD_CHECK_GL_ERRORS_AFTER( OPERATION ) Crimild::GLFWUtils::checkErrors( std::string( "Error after " ) + #OPERATION );
 
 #endif
 

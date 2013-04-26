@@ -17,5 +17,6 @@ Makefile
 cmake_install.cmake
 gtest-1.6.0
 
-examples/Triangle/Triangle
 examples/Primitives/Primitives
+examples/Textures/Textures
+examples/Triangle/Triangle

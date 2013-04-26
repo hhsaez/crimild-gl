@@ -25,22 +25,51 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GLFW_RENDERING_UTILS_
-#define CRIMILD_GLFW_RENDERING_UTILS_
-
 #include <Crimild.hpp>
+#include <CrimildGL.hpp>
 
-namespace Crimild {
+using namespace Crimild;
 
-	class GLFWUtils {
-	public:
-		static void checkErrors( std::string prefix );
+int main( int argc, char **argv )
+{
+	FileSystem::getInstance().init( argc, argv );
+
+	float vertices[] = {
+		-1.0f, +1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+		+1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+		+1.0f, +1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f
 	};
 
+	unsigned short indices[] = {
+		0, 1, 2,
+		0, 2, 3
+	};
+
+	PrimitivePtr primitive( new Primitive( Primitive::Type::TRIANGLES ) );
+	primitive->setVertexBuffer( VertexBufferObjectPtr( new VertexBufferObject( VertexFormat::VF_P3_N3_UV2, 4, vertices ) ) );
+	primitive->setIndexBuffer( IndexBufferObjectPtr( new IndexBufferObject( 6, indices ) ) );
+
+	GeometryNodePtr geometry( new GeometryNode() );
+	geometry->attachPrimitive( primitive );
+	geometry->local().setTranslate( 0.0f, 0.0f, -3.0f );
+
+	MaterialPtr material( new Material() );
+	ImagePtr image( new ImageTGA( FileSystem::getInstance().pathForResource( "bricks.tga" ) ) );
+	TexturePtr texture( new Texture( image ) );
+	material->setColorMap( texture );
+	MaterialComponentPtr materials( new MaterialComponent() );
+	materials->attachMaterial( material );
+	geometry->attachComponent( materials );
+
+	GroupNodePtr scene( new GroupNode() );
+	scene->attachNode( geometry );
+
+	CameraNodePtr camera( new CameraNode() );
+	scene->attachNode( camera );
+
+	SimulationPtr sim( new GLSimulation( "Textures" ) );
+	sim->attachScene( scene );
+	return sim->run();
 }
-
-#define CRIMILD_CHECK_GL_ERRORS_BEFORE( OPERATION ) Crimild::GLFWUtils::checkErrors( std::string( "Error before " ) + #OPERATION );
-#define CRIMILD_CHECK_GL_ERRORS_AFTER( OPERATION ) Crimild::GLFWUtils::checkErrors( std::string( "Error after " ) + #OPERATION );
-
-#endif
 

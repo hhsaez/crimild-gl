@@ -25,22 +25,44 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GLFW_RENDERING_UTILS_
-#define CRIMILD_GLFW_RENDERING_UTILS_
+#include "TextureShaderProgram.hpp"
 
-#include <Crimild.hpp>
+using namespace Crimild;
 
-namespace Crimild {
+const char *texture_vs = { CRIMILD_TO_STRING(
+	attribute vec3 position; 
+	attribute vec2 textureCoords;
 
-	class GLFWUtils {
-	public:
-		static void checkErrors( std::string prefix );
-	};
+	uniform mat4 projMatrix; 
+	uniform mat4 viewMatrix; 
+	uniform mat4 modelMatrix; 
 
+	varying vec2 uv;
+
+	void main( void )  
+	{ 
+		uv = textureCoords;
+		gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0); 
+	}
+)};
+
+const char *texture_fs = { CRIMILD_TO_STRING( 
+	uniform sampler2D colorMap;
+
+	varying vec2 uv;
+
+	void main( void ) 
+	{ 
+		gl_FragColor = texture2D( colorMap, vec2(uv.s, uv.t ) );
+	}
+)};
+
+TextureShaderProgram::TextureShaderProgram( void )
+	: ShaderProgram( VertexShaderPtr( new VertexShader( texture_vs ) ), FragmentShaderPtr( new FragmentShader( texture_fs ) ) )
+{ 
 }
 
-#define CRIMILD_CHECK_GL_ERRORS_BEFORE( OPERATION ) Crimild::GLFWUtils::checkErrors( std::string( "Error before " ) + #OPERATION );
-#define CRIMILD_CHECK_GL_ERRORS_AFTER( OPERATION ) Crimild::GLFWUtils::checkErrors( std::string( "Error after " ) + #OPERATION );
-
-#endif
+TextureShaderProgram::~TextureShaderProgram( void )
+{ 
+}
 
