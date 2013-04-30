@@ -2,7 +2,7 @@ INCLUDE( MacroAddSources )
 INCLUDE( MacroExtractArchive )
 INCLUDE( ExternalProject )
 
-SET( CRIMILD_LIBRARY_NAME crimild-glfw )
+SET( CRIMILD_LIBRARY_NAME crimild-gl )
 
 IF ( NOT EXISTS ${CRIMILD_GL_SOURCE_DIR}/third-party/glfw-2.7.8 )
 	EXTRACT_ARCHIVE( glfw-2.7.8.zip glfw-2.7.8 ${CRIMILD_GL_SOURCE_DIR}/third-party )
@@ -16,10 +16,15 @@ IF ( NOT EXISTS ${CRIMILD_GL_SOURCE_DIR}/third-party/glfw-2.7.8 )
 	ENDIF ( APPLE )
 ENDIF ( NOT EXISTS ${CRIMILD_GL_SOURCE_DIR}/third-party/glfw-2.7.8 )
 
+IF ( NOT EXISTS ${CRIMILD_GL_SOURCE_DIR}/third-party/glew-1.9.0 )
+	EXTRACT_ARCHIVE( glew-1.9.0.tgz glew-1.9.0 ${CRIMILD_GL_SOURCE_DIR}/third-party )
+ENDIF ( NOT EXISTS ${CRIMILD_GL_SOURCE_DIR}/third-party/glew-1.9.0 )
+
 SET( CRIMILD_INCLUDE_DIRECTORIES 
 	${CRIMILD_SOURCE_DIR}/src 
 	${CRIMILD_GL_SOURCE_DIR}/src 
-	${CRIMILD_GL_SOURCE_DIR}/third-party/glfw-2.7.8/include )
+	${CRIMILD_GL_SOURCE_DIR}/third-party/glfw-2.7.8/include
+	${CRIMILD_GL_SOURCE_DIR}/third-party/glew-1.9.0/include )
 
 SET( CRIMILD_LINK_DIRECTORIES 
 	${CRIMILD_SOURCE_DIR}/lib
@@ -31,5 +36,9 @@ SET( CRIMILD_LIBRARY_LINK_LIBRARIES
 
 ADD_SOURCES( ${CRIMILD_GL_SOURCE_DIR}/src *.hpp )
 ADD_SOURCES( ${CRIMILD_GL_SOURCE_DIR}/src *.cpp )
+
+IF ( APPLE )
+	ADD_SOURCES( ${CRIMILD_GL_SOURCE_DIR}/third-party/glew-1.9.0/src glew.c )
+ENDIF ( APPLE )
 
 INCLUDE( ModuleBuildLibrary )

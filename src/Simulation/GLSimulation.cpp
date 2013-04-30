@@ -27,6 +27,8 @@
 
 #include "GLSimulation.hpp"
 #include "Tasks/WindowTask.hpp"
+#include "Tasks/UpdateTimeTask.hpp"
+#include "Tasks/UpdateInputStateTask.hpp"
 #include "Rendering/GLFWRenderer.hpp"
 
 #include <GL/glfw.h>
@@ -49,8 +51,14 @@ void GLSimulation::start( void )
 		throw RuntimeException( "Cannot start GLFW: glwfInit failed!" );
 	}
 
-	WindowTaskPtr windowTask( new WindowTask( 99999, 1280, 720 ) );
+	WindowTaskPtr windowTask( new WindowTask( 9000, 1280, 720 ) );
 	getMainLoop()->startTask( windowTask );
+
+	UpdateTimeTaskPtr updateTimeTask( new UpdateTimeTask( 9999 ) );
+	getMainLoop()->startTask( updateTimeTask );
+
+	UpdateInputStateTaskPtr updateInputStateTask( new UpdateInputStateTask( 0 ) );
+	getMainLoop()->startTask( updateInputStateTask );
 
 	Simulation::start();
 }

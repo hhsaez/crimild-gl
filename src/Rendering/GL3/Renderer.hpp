@@ -25,17 +25,49 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#ifndef CRIMILD_GL3_RENDERER_RENDERER_
+#define CRIMILD_GL3_RENDERER_RENDERER_
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <Crimild.hpp>
 
-#include "Simulation/GLSimulation.hpp"
+namespace Crimild {
+
+	namespace GL3 {
+
+		class Renderer : public Crimild::Renderer {
+		public:
+			Renderer( FrameBufferObjectPtr screenBuffer );
+			virtual ~Renderer( void );
+
+			virtual void configure( void ) override;
+
+			virtual void beginRender( void ) override;
+			
+			virtual void clearBuffers( void ) override;
+
+			virtual void enableMaterialProperties( ShaderProgram *program, Material *material ) override;
+
+			virtual void applyTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera ) override;
+
+			virtual void drawPrimitive( ShaderProgram *program, Primitive *primitive ) override;
+
+			virtual void restoreTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera ) override;
+
+			virtual void disableMaterialProperties( ShaderProgram *program, Material *material ) override;
+
+			virtual void endRender( void ) override;
+
+			virtual ShaderProgram *getFallbackProgram( Material *material, Primitive *primitive ) override;
+
+		private:
+			std::map< std::string, ShaderProgramPtr > _fallbackPrograms;
+		};
+
+		typedef std::shared_ptr< Renderer > RendererPtr;
+
+	}
+
+}
 
 #endif
 

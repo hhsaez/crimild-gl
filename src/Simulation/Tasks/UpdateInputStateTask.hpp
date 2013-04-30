@@ -25,17 +25,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#ifndef CRIMILD_GL_TASKS_UPDATE_INPUT_STATE_
+#define CRIMILD_GL_TASKS_UPDATE_INPUT_STATE_
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <Crimild.hpp>
 
-#include "Simulation/GLSimulation.hpp"
+namespace Crimild {
+
+	class UpdateInputStateTask : public Task {
+	public:
+		UpdateInputStateTask( int priority );
+		virtual ~UpdateInputStateTask( void );
+
+		virtual void start( void ) override;
+		virtual void update( void ) override;
+		virtual void stop( void ) override;
+	};
+
+	typedef std::shared_ptr< UpdateInputStateTask > UpdateInputStateTaskPtr;
+
+}
 
 #endif
 

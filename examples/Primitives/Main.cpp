@@ -35,13 +35,12 @@ int main( int argc, char **argv )
 	GeometryNodePtr geometry( new GeometryNode() );
 	PrimitivePtr primitive( new NewellTeapotPrimitive() );
 	geometry->attachPrimitive( primitive );
-	geometry->local().setTranslate( 0.0f, -0.65f, -3.0f );
-	geometry->local().setScale( 0.05f );
 	RotationComponentPtr rotationComponent( new RotationComponent( Vector3f( 0, 1, 0 ), 0.25 ) );
 	geometry->attachComponent( rotationComponent );
 
 	GroupNodePtr scene( new GroupNode() );
 	scene->attachNode( geometry );
+	scene->local().setTranslate( 0.0f, -10.0f, -100.0f );
 
 	CameraNodePtr camera( new CameraNode() );
 	scene->attachNode( camera );

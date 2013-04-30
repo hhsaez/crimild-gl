@@ -25,85 +25,117 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "GLFWRenderer.hpp"
-#include "GLFWShaderProgramCatalog.hpp"
-#include "GLFWVertexBufferObjectCatalog.hpp"
-#include "GLFWIndexBufferObjectCatalog.hpp"
-#include "GLFWTextureCatalog.hpp"
-#include "ShaderLibrary/SimpleShaderProgram.hpp"
-#include "ShaderLibrary/TextureShaderProgram.hpp"
-#include "GLFWUtils.hpp"
+#include "Renderer.hpp"
+#include "ShaderProgramCatalog.hpp"
+#include "VertexBufferObjectCatalog.hpp"
+#include "IndexBufferObjectCatalog.hpp"
+#include "TextureCatalog.hpp"
+#include "Library/FlatShaderProgram.hpp"
+#include "Library/ColorShaderProgram.hpp"
+#include "Library/TextureShaderProgram.hpp"
+#include "Utils.hpp"
 
+#include <GL/glew.h>
 #include <GL/glfw.h>
 
 using namespace Crimild;
 
-GLFWRenderer::GLFWRenderer( FrameBufferObjectPtr screenBuffer )
+GL3::Renderer::Renderer( FrameBufferObjectPtr screenBuffer )
 {
-	setShaderProgramCatalog( ShaderProgramCatalogPtr( new GLFWShaderProgramCatalog() ) );
-	setVertexBufferObjectCatalog( VertexBufferObjectCatalogPtr( new GLFWVertexBufferObjectCatalog() ) );
-	setIndexBufferObjectCatalog( IndexBufferObjectCatalogPtr( new GLFWIndexBufferObjectCatalog() ) );
-	setTextureCatalog( TextureCatalogPtr( new GLFWTextureCatalog() ) );
+	setShaderProgramCatalog( ShaderProgramCatalogPtr( new GL3::ShaderProgramCatalog() ) );
+	setVertexBufferObjectCatalog( VertexBufferObjectCatalogPtr( new GL3::VertexBufferObjectCatalog() ) );
+	setIndexBufferObjectCatalog( IndexBufferObjectCatalogPtr( new GL3::IndexBufferObjectCatalog() ) );
+	setTextureCatalog( TextureCatalogPtr( new GL3::TextureCatalog() ) );
 
 	MaterialPtr material( new Material() );
-	ShaderProgramPtr program( new SimpleShaderProgram() );
-	material->setProgram( program );
+	material->setDiffuse( RGBAColorf( 1.0f, 0.0f, 1.0f, 1.0f ) );
 	setDefaultMaterial( material );
 
-	_fallbackPrograms[ "simple" ] = ShaderProgramPtr( new SimpleShaderProgram() );
+	_fallbackPrograms[ "flat" ] = ShaderProgramPtr( new FlatShaderProgram() );
+	_fallbackPrograms[ "color" ] = ShaderProgramPtr( new ColorShaderProgram() );
 	_fallbackPrograms[ "texture" ] = ShaderProgramPtr( new TextureShaderProgram() );
 
 	setScreenBuffer( screenBuffer );
 }
 
-GLFWRenderer::~GLFWRenderer( void )
+GL3::Renderer::~Renderer( void )
 {
 
 }
 
-void GLFWRenderer::configure( void )
+void GL3::Renderer::configure( void )
 {
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+	CRIMILD_CHECK_GL_ERRORS_BEFORE_CURRENT_FUNCTION;
+
+	Log::Info << "Configuring renderer"
+    		  << "\n       OpenGL version: " << glGetString( GL_VERSION )
+    		  << "\n       GLSL version: " << glGetString( GL_SHADING_LANGUAGE_VERSION )
+    		  << "\n       Vendor: " << glGetString( GL_VENDOR )
+    		  << "\n       Renderer: " << glGetString( GL_RENDERER )
+    		  << Log::End;
+
+	glewExperimental = GL_TRUE; //stops glew crashing on OSX :-/
+	if ( glewInit() != GLEW_OK ) {
+		Log::Fatal << "Cannot initialize GLEW" << Log::End;
+		exit( 1 );
+	}
+
+	if ( !GLEW_VERSION_3_2 ) {
+		Log::Fatal << "OpenGL 3.2 API is not available" << Log::End;
+		exit( 1 );
+    }
+
+    glEnable( GL_DEPTH_TEST );
+    glDepthFunc( GL_LESS );
+
+    CRIMILD_CHECK_GL_ERRORS_AFTER_CURRENT_FUNCTION;
 }
 
-void GLFWRenderer::beginRender( void )
+void GL3::Renderer::beginRender( void )
 {
 
 }
 
-void GLFWRenderer::endRender( void )
+void GL3::Renderer::endRender( void )
 {
 
 }
 
-void GLFWRenderer::clearBuffers( void )
+void GL3::Renderer::clearBuffers( void )
 {
 	const RGBAColorf &clearColor = getScreenBuffer()->getClearColor();
 	glClearColor( clearColor.r(), clearColor.g(), clearColor.b(), clearColor.a() );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
-void GLFWRenderer::applyTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera )
+void GL3::Renderer::enableMaterialProperties( ShaderProgram *program, Material *material )
+{
+	ShaderLocation *materialDiffuseLocation = program->getMaterialDiffuseUniformLocation();
+	if ( materialDiffuseLocation && materialDiffuseLocation->isValid() ) {
+		glUniform4fv( materialDiffuseLocation->getLocation(), 1, static_cast< const float * >( material->getDiffuse() ) );
+	}
+}
+
+void GL3::Renderer::applyTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera )
 {
 	ShaderLocation *projMatrixLocation = program->getProjectionMatrixUniformLocation();
-	if ( projMatrixLocation->isValid() ) {
+	if ( projMatrixLocation && projMatrixLocation->isValid() ) {
 		glUniformMatrix4fv( projMatrixLocation->getLocation(), 1, GL_FALSE, static_cast< const float * >( camera->getProjectionMatrix() ) );
 	}
 
 	ShaderLocation *viewMatrixLocation = program->getViewMatrixUniformLocation();
-	if ( viewMatrixLocation->isValid() ) {
+	if ( viewMatrixLocation && viewMatrixLocation->isValid() ) {
 		glUniformMatrix4fv( viewMatrixLocation->getLocation(), 1, GL_FALSE, static_cast< const GLfloat * >( camera->getViewMatrix() ) );
 	}
 
 	ShaderLocation *modelMatrixLocation = program->getModelMatrixUniformLocation();
-	if ( modelMatrixLocation->isValid() ) {
+	if ( modelMatrixLocation && modelMatrixLocation->isValid() ) {
 		Matrix4f modelMatrix = geometry->getWorld().computeModelMatrix();
 		glUniformMatrix4fv( modelMatrixLocation->getLocation(), 1, GL_FALSE, static_cast< const GLfloat * >( modelMatrix ) );
 	}
 }
 
-void GLFWRenderer::drawPrimitive( ShaderProgram *program, Primitive *primitive )
+void GL3::Renderer::drawPrimitive( ShaderProgram *program, Primitive *primitive )
 {
 	GLenum type;
 	switch ( primitive->getType() ) {
@@ -144,20 +176,29 @@ void GLFWRenderer::drawPrimitive( ShaderProgram *program, Primitive *primitive )
 				   ( const GLvoid * ) base );
 	
 
-	CRIMILD_CHECK_GL_ERRORS_AFTER( GLFWRenderer::drawPrimitive );
+	CRIMILD_CHECK_GL_ERRORS_AFTER_CURRENT_FUNCTION;
 }
 
-void GLFWRenderer::restoreTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera )
+void GL3::Renderer::restoreTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera )
 {
 
 }
 
-ShaderProgram *GLFWRenderer::getFallbackProgram( Material *material, Primitive * )
+void GL3::Renderer::disableMaterialProperties( ShaderProgram *program, Material *material )
+{
+
+}
+
+ShaderProgram *GL3::Renderer::getFallbackProgram( Material *material, Primitive *primitive )
 {
 	if ( material->getColorMap() ) {
 		return _fallbackPrograms[ "texture" ].get();
 	}
 
-	return _fallbackPrograms[ "simple" ].get();
+	if ( primitive->getVertexBuffer()->getVertexFormat().hasColors() ) {
+		return _fallbackPrograms[ "color" ].get();
+	}
+
+	return _fallbackPrograms[ "flat" ].get();
 }
 

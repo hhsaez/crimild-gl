@@ -25,17 +25,60 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#include "IndexBufferObjectCatalog.hpp"
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <GL/glfw.h>
 
-#include "Simulation/GLSimulation.hpp"
+using namespace Crimild;
 
-#endif
+GL3::IndexBufferObjectCatalog::IndexBufferObjectCatalog( void )
+{
+
+}
+
+GL3::IndexBufferObjectCatalog::~IndexBufferObjectCatalog( void )
+{
+
+}
+
+int GL3::IndexBufferObjectCatalog::getNextResourceId( void )
+{
+    GLuint id;
+    glGenBuffers( 1, &id );
+    return id;
+}
+
+void GL3::IndexBufferObjectCatalog::bind( ShaderProgram *program, IndexBufferObject *ibo )
+{
+	Catalog< IndexBufferObject >::bind( program, ibo );
+
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo->getCatalogId() );
+}
+
+void GL3::IndexBufferObjectCatalog::unbind( ShaderProgram *program, IndexBufferObject *ibo )
+{
+	Catalog< IndexBufferObject >::unbind( program, ibo );
+
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+}
+
+void GL3::IndexBufferObjectCatalog::load( IndexBufferObject *ibo )
+{
+	Catalog< IndexBufferObject >::load( ibo );
+
+	int id = ibo->getCatalogId();
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, id );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, 
+		sizeof( unsigned short ) * ibo->getIndexCount(), 
+		ibo->getData(), 
+		GL_STATIC_DRAW );
+}
+
+void GL3::IndexBufferObjectCatalog::unload( IndexBufferObject *ibo )
+{
+	GLuint bufferId = ibo->getCatalogId();
+	glDeleteBuffers( 1, &bufferId );
+
+	Catalog< IndexBufferObject >::unload( ibo );
+}
 

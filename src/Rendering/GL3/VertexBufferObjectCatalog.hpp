@@ -25,17 +25,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#ifndef CRIMILD_GL3_VERTEX_BUFFER_OBJECT_CATALOG_
+#define CRIMILD_GL3_VERTEX_BUFFER_OBJECT_CATALOG_
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <Crimild.hpp>
 
-#include "Simulation/GLSimulation.hpp"
+namespace Crimild {
+
+	namespace GL3 {
+
+		class VertexBufferObjectCatalog : public Catalog< VertexBufferObject > {
+		public:
+			VertexBufferObjectCatalog( void );
+			virtual ~VertexBufferObjectCatalog( void );
+
+			virtual int getNextResourceId( void ) override;
+
+			virtual void bind( ShaderProgram *program, VertexBufferObject *vbo ) override;
+			virtual void unbind( ShaderProgram *program, VertexBufferObject *vbo ) override;
+
+			virtual void load( VertexBufferObject *vbo ) override;
+			virtual void unload( VertexBufferObject *vbo ) override;
+
+		private:
+			int composeId( unsigned int vaoId, unsigned int vboId );
+			bool extractId( int compositeId, unsigned int &vaoId, unsigned int &vboId );
+		};
+
+		typedef std::shared_ptr< VertexBufferObjectCatalog > VertexBufferObjectCatalogPtr;
+
+	}
+
+}
 
 #endif
 

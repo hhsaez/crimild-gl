@@ -25,17 +25,59 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#include "UpdateInputStateTask.hpp"
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <GL/glfw.h>
 
-#include "Simulation/GLSimulation.hpp"
+using namespace Crimild;
 
-#endif
+InputState &InputState::getCurrentState( void )
+{
+	static InputState instance;
+	return instance;
+}
+
+UpdateInputStateTask::UpdateInputStateTask( int priority )
+	: Task( priority )
+{
+}
+
+UpdateInputStateTask::~UpdateInputStateTask( void )
+{
+
+}
+
+void UpdateInputStateTask::start( void )
+{
+	InputState::getCurrentState().reset( 256, 8 );
+}
+
+void UpdateInputStateTask::stop( void )
+{
+
+}
+
+void UpdateInputStateTask::update( void )
+{
+	glfwPollEvents();
+
+	for ( int i = 0; i < 256; i++ ) {
+		int keyState = glfwGetKey( i );
+		InputState::getCurrentState().setKeyState( i, keyState == GLFW_PRESS ? InputState::KeyState::PRESSED : InputState::KeyState::RELEASED );
+	}
+
+	int x, y;
+	glfwGetMousePos( &x, &y );
+
+	FrameBufferObject *fbo = Simulation::getCurrent()->getRenderer()->getScreenBuffer();
+	if ( fbo && x >= 0 && x < fbo->getWidth() && y >= 0 && y < fbo->getHeight() ) {
+		InputState::getCurrentState().setMousePosition( Vector2i( x, y ) );
+		InputState::getCurrentState().setNormalizedMousePosition( Vector2f( ( float ) x / ( fbo->getWidth() - 1.0f ), ( float ) y / ( fbo->getHeight() - 1.0f ) ) );
+	}
+
+	for ( int i = GLFW_MOUSE_BUTTON_1; i < GLFW_MOUSE_BUTTON_8; i++ ) {
+		int buttonState = glfwGetMouseButton( i );
+		InputState::getCurrentState().setMouseButtonState( i, buttonState == GLFW_PRESS ? InputState::MouseButtonState::PRESSED : InputState::MouseButtonState::RELEASED );
+	}
+}
 

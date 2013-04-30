@@ -25,17 +25,61 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#include "Utils.hpp"
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <GL/glew.h>
+#include <GL/glfw.h>
 
-#include "Simulation/GLSimulation.hpp"
+using namespace Crimild;
 
-#endif
+void GL3::Utils::checkErrors( std::string prefix )
+{
+    for ( GLint error = glGetError(); error; error = glGetError() ) {
+
+    	std::string errorDescription;
+    	switch (error) {
+			case GL_INVALID_ENUM:
+				errorDescription += "GL_INVALID_ENUM";
+				break;
+
+			case GL_INVALID_VALUE:
+				errorDescription += "GL_INVALID_VALUE";
+				break;
+
+			case GL_INVALID_OPERATION:
+				errorDescription += "GL_INVALID_OPERATION";
+				break;
+
+			case GL_STACK_OVERFLOW:
+				errorDescription += "GL_STACK_OVERFLOW";  
+				break;
+
+			case GL_STACK_UNDERFLOW: 
+				errorDescription += "GL_STACK_UNDERFLOW";
+				break;
+
+			case GL_OUT_OF_MEMORY: 
+				errorDescription += "GL_OUT_OF_MEMORY";
+				break;
+
+			default:
+				errorDescription += "Unknown Error";
+				break;
+    	}
+
+    	Log::Error << prefix << ": " << "(0x" << error << ") " << errorDescription << " " << glewGetErrorString( error ) << Log::End; 
+    }
+}
+
+VertexShaderPtr GL3::Utils::getVertexShaderInstance( std::string source )
+{
+	VertexShaderPtr shader( new VertexShader( "#version 150\n" + source ) );
+	return shader;
+}
+
+FragmentShaderPtr GL3::Utils::getFragmentShaderInstance( std::string source )
+{
+	FragmentShaderPtr shader( new FragmentShader( "#version 150\n" + source ) );
+	return shader;
+}
 

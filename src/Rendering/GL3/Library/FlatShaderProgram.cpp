@@ -25,17 +25,53 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
-
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
+#include "FlatShaderProgram.hpp"
 #include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
 
-#include "Simulation/GLSimulation.hpp"
+using namespace Crimild;
+using namespace Crimild::GL3;
 
-#endif
+const char *flat_vs = { CRIMILD_TO_STRING(
+	in vec3 aPosition;
+
+	uniform mat4 uPMatrix; 
+	uniform mat4 uVMatrix; 
+	uniform mat4 uMMatrix;
+
+	void main()
+	{
+		gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aPosition, 1.0); 
+	}
+)};
+
+const char *flat_fs = { CRIMILD_TO_STRING( 
+	struct Material {
+		vec4 diffuse;
+	};
+
+	uniform Material uMaterial; 
+
+	out vec4 vFragColor;
+
+	void main( void ) 
+	{ 
+		vFragColor = uMaterial.diffuse; 
+	}
+)};
+
+FlatShaderProgram::FlatShaderProgram( void )
+	: ShaderProgram( Utils::getVertexShaderInstance( flat_vs ), Utils::getFragmentShaderInstance( flat_fs ) )
+{ 
+	registerPositionAttributeLocation( "aPosition" );
+
+	registerProjectionMatrixUniformLocation( "uPMatrix" );
+	registerViewMatrixUniformLocation( "uVMatrix" );
+	registerModelMatrixUniformLocation( "uMMatrix" );
+
+	registerMaterialDiffuseUniformLocation( "uMaterial.diffuse" );
+}
+
+FlatShaderProgram::~FlatShaderProgram( void )
+{ 
+}
 

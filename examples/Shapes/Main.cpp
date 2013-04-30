@@ -32,32 +32,35 @@ using namespace Crimild;
 
 int main( int argc, char **argv )
 {
-	float vertices[] = {
-		-1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-		1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0, 0.0f, 0.0f, 1.0f, 0.0f
-	};
-
-	unsigned short indices[] = {
-		0, 1, 2
-	};
-
-	VertexBufferObjectPtr vbo( new VertexBufferObject( VertexFormat::VF_P3_C4, 3, vertices ) );
-	IndexBufferObjectPtr ibo( new IndexBufferObject( 3, indices ) );
-	
-	PrimitivePtr primitive( new Primitive( Primitive::Type::TRIANGLES ) );
-	primitive->setVertexBuffer( vbo );
-	primitive->setIndexBuffer( ibo );
-
-	GeometryNodePtr geometry( new GeometryNode() );
-	geometry->attachPrimitive( primitive );
-
-	geometry->local().setTranslate( 0, 0, -3 );
-	RotationComponentPtr rotationComponent( new RotationComponent( Vector3f( 0, 1, 0 ), 0.5 ) );
-	geometry->attachComponent( rotationComponent );
-
 	GroupNodePtr scene( new GroupNode() );
-	scene->attachNode( geometry );
+
+	GeometryNodePtr kleinBottle( new GeometryNode() );
+	PrimitivePtr kleinBottlePrimitive( new KleinBottlePrimitive( Primitive::Type::LINES, 0.1 ) );
+	kleinBottle->attachPrimitive( kleinBottlePrimitive );
+	kleinBottle->local().setTranslate( 0.0f, 0.0f, 3.0f );
+	scene->attachNode( kleinBottle );
+
+	GeometryNodePtr mobiusStrip( new GeometryNode() );
+	PrimitivePtr mobiusStripPrimitive( new MobiusStripPrimitive( Primitive::Type::LINES, 0.5f ) );
+	mobiusStrip->attachPrimitive( mobiusStripPrimitive );
+	mobiusStrip->local().setTranslate( 0.0f, 0.0f, -3.0f );
+	scene->attachNode( mobiusStrip );
+
+	GeometryNodePtr torus( new GeometryNode() );
+	PrimitivePtr torusPrimitive( new TorusPrimitive( Primitive::Type::LINES, 1.0f, 0.25f ) );
+	torus->attachPrimitive( torusPrimitive );
+	torus->local().setTranslate( 3.0f, 0.0f, 0.0f );
+	scene->attachNode( torus );
+
+	GeometryNodePtr trefoilKnot( new GeometryNode() );
+	PrimitivePtr trefoilKnotPrimitive( new TrefoilKnotPrimitive( Primitive::Type::LINES, 1.0 ) );
+	trefoilKnot->attachPrimitive( trefoilKnotPrimitive );
+	trefoilKnot->local().setTranslate( -3.0f, 0.0f, 0.0f );
+	scene->attachNode( trefoilKnot );
+
+	scene->local().setTranslate( 0.0f, 0.0f, -10.0f );
+	NodeComponentPtr rotate( new RotationComponent( Vector3f( 0.0f, 1.0f, 0.0f ), 0.1f ) );
+	scene->attachComponent( rotate );
 
 	CameraNodePtr camera( new CameraNode() );
 	scene->attachNode( camera );

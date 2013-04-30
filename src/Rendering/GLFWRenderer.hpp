@@ -51,7 +51,7 @@ namespace Crimild {
 
 		virtual void endRender( void ) override;
 
-		virtual ShaderProgram *getFallbackProgram( Material *material ) override;
+		virtual ShaderProgram *getFallbackProgram( Material *material, Primitive * ) override;
 
 	private:
 		std::map< std::string, ShaderProgramPtr > _fallbackPrograms;

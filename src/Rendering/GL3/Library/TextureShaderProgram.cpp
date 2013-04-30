@@ -25,17 +25,56 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
-
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
+#include "TextureShaderProgram.hpp"
 #include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
 
-#include "Simulation/GLSimulation.hpp"
+using namespace Crimild;
+using namespace Crimild::GL3;
 
-#endif
+const char *texture_vs = { CRIMILD_TO_STRING( 
+	in vec3 aPosition;
+	in vec2 aTextureCoord;
+
+	uniform mat4 uPMatrix; 
+	uniform mat4 uVMatrix; 
+	uniform mat4 uMMatrix;
+
+	out vec2 vTextureCoord;
+
+	void main()
+	{
+		vTextureCoord = aTextureCoord;
+		gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aPosition, 1.0); 
+	}
+)};
+
+const char *texture_fs = { CRIMILD_TO_STRING( 
+	in vec2 vTextureCoord;
+
+	uniform sampler2D uColorMap;
+
+	out vec4 vFragColor;
+
+	void main( void ) 
+	{ 
+		vFragColor = texture( uColorMap, vTextureCoord );
+	}
+)};
+
+TextureShaderProgram::TextureShaderProgram( void )
+	: ShaderProgram( Utils::getVertexShaderInstance( texture_vs ), Utils::getFragmentShaderInstance( texture_fs ) )
+{ 
+	registerPositionAttributeLocation( "aPosition" );
+	registerTextureCoordAttributeLocation( "aTextureCoord" );
+
+	registerProjectionMatrixUniformLocation( "uPMatrix" );
+	registerViewMatrixUniformLocation( "uVMatrix" );
+	registerModelMatrixUniformLocation( "uMMatrix" );
+
+	registerMaterialColorMapUniformLocation( "uColorMap" );
+}
+
+TextureShaderProgram::~TextureShaderProgram( void )
+{ 
+}
 

@@ -25,17 +25,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#ifndef CRIMILD_GL3_TEXTURE_CATALOG_
+#define CRIMILD_GL3_TEXTURE_CATALOG_
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <Crimild.hpp>
 
-#include "Simulation/GLSimulation.hpp"
+namespace Crimild {
+
+	namespace GL3 {
+
+		class TextureCatalog : public Catalog< Texture > {
+		public:
+			TextureCatalog( void );
+			virtual ~TextureCatalog( void );
+
+			virtual int getNextResourceId( void ) override;
+
+			virtual void bind( ShaderProgram *program, Texture *texture ) override;
+			virtual void unbind( ShaderProgram *program, Texture *texture ) override;
+
+			virtual void load( Texture *texture ) override;
+			virtual void unload( Texture *texture ) override;
+
+		private:
+			int _boundTextureCount;
+		};
+
+		typedef std::shared_ptr< TextureCatalog > TextureCatalogPtr;
+
+	}
+
+}
 
 #endif
 

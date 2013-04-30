@@ -25,17 +25,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#ifndef CRIMILD_GL3_RENDERING_UTILS_
+#define CRIMILD_GL3_RENDERING_UTILS_
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <Crimild.hpp>
 
-#include "Simulation/GLSimulation.hpp"
+namespace Crimild {
+
+	namespace GL3 {
+
+		class Utils {
+		public:
+			static void checkErrors( std::string prefix );
+
+			static VertexShaderPtr getVertexShaderInstance( std::string source );
+			
+			static FragmentShaderPtr getFragmentShaderInstance( std::string source );
+		};
+
+	}
+
+}
+
+#define CRIMILD_CHECK_GL_ERRORS_BEFORE_CURRENT_FUNCTION Crimild::GL3::Utils::checkErrors( std::string( "Before " ) + CRIMILD_CURRENT_FUNCTION );
+#define CRIMILD_CHECK_GL_ERRORS_AFTER_CURRENT_FUNCTION Crimild::GL3::Utils::checkErrors( std::string( "After " ) + CRIMILD_CURRENT_FUNCTION );
 
 #endif
 

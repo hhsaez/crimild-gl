@@ -26,7 +26,7 @@
  */
 
 #include "WindowTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
+#include "Rendering/GL3/Renderer.hpp"
 
 #include <GL/glfw.h>
 
@@ -44,16 +44,22 @@ WindowTask::~WindowTask( void )
 
 void WindowTask::start( void )
 {
-	FrameBufferObjectPtr screenBuffer( new FrameBufferObject( 1024, 768 ) );
+	FrameBufferObjectPtr screenBuffer( new FrameBufferObject( 1024, 768, 8, 8, 8, 8, 16, 0 ) );
 	screenBuffer->setClearColor( RGBAColorf( 0.5f, 0.5f, 0.5f, 1.0f ) );
 
+	glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
+	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 2 );
     glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, GL_TRUE );
 
-    if ( !glfwOpenWindow( screenBuffer->getWidth(), screenBuffer->getHeight(), 8, 8, 8, 8, 16, 0, GLFW_WINDOW ) ) {
+    if ( !glfwOpenWindow( screenBuffer->getWidth(), screenBuffer->getHeight(), 
+    					  screenBuffer->getRedBits(), screenBuffer->getGreenBits(), screenBuffer->getBlueBits(), screenBuffer->getAlphaBits(),
+    					  screenBuffer->getDepthBits(), screenBuffer->getStencilBits(),
+    					  GLFW_WINDOW ) ) {
     	throw RuntimeException( "Cannot created main window" );
     }
 
-	GLFWRendererPtr renderer( new GLFWRenderer( screenBuffer ) );
+	RendererPtr renderer( new GL3::Renderer( screenBuffer ) );
 	Simulation::getCurrent()->setRenderer( renderer );
 }
 

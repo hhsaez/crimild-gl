@@ -25,17 +25,45 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#include "UpdateTimeTask.hpp"
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <GL/glfw.h>
 
-#include "Simulation/GLSimulation.hpp"
+using namespace Crimild;
 
-#endif
+UpdateTimeTask::UpdateTimeTask( int priority )
+	: Task( priority )
+{
+}
+
+UpdateTimeTask::~UpdateTimeTask( void )
+{
+
+}
+
+void UpdateTimeTask::start( void )
+{
+	Time &t = Simulation::getCurrent()->getSimulationTime();
+
+	double currentTime = glfwGetTime();
+	t.setCurrentTime( currentTime );
+	t.setLastTime( currentTime );
+	t.setDeltaTime( 0.0f );
+}
+
+void UpdateTimeTask::stop( void )
+{
+}
+
+void UpdateTimeTask::update( void )
+{
+	Time &t = Simulation::getCurrent()->getSimulationTime();
+
+	double lastTime = t.getCurrentTime();
+	double currentTime = glfwGetTime();
+
+	t.setCurrentTime( currentTime );
+	t.setLastTime( lastTime );
+	t.setDeltaTime( currentTime - lastTime );
+}
 

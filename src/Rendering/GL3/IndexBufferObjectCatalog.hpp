@@ -25,17 +25,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#ifndef CRIMILD_GL3_INDEX_BUFFER_OBJECT_CATALOG_
+#define CRIMILD_GL3_INDEX_BUFFER_OBJECT_CATALOG_
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <Crimild.hpp>
 
-#include "Simulation/GLSimulation.hpp"
+namespace Crimild {
+
+	namespace GL3 {
+
+		class IndexBufferObjectCatalog : public Catalog< IndexBufferObject > {
+		public:
+			IndexBufferObjectCatalog( void );
+			virtual ~IndexBufferObjectCatalog( void );
+
+			virtual int getNextResourceId( void ) override;
+
+			virtual void bind( ShaderProgram *program, IndexBufferObject *ibo ) override;
+			virtual void unbind( ShaderProgram *program, IndexBufferObject *ibo ) override;
+
+			virtual void load( IndexBufferObject *ibo ) override;
+			virtual void unload( IndexBufferObject *ibo ) override;
+		};
+
+	}
+
+}
 
 #endif
 
