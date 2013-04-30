@@ -29,7 +29,6 @@
 #include "Tasks/WindowTask.hpp"
 #include "Tasks/UpdateTimeTask.hpp"
 #include "Tasks/UpdateInputStateTask.hpp"
-#include "Rendering/GLFWRenderer.hpp"
 
 #include <GL/glfw.h>
 
