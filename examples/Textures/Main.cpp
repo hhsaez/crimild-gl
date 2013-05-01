@@ -32,35 +32,25 @@ using namespace Crimild;
 
 int main( int argc, char **argv )
 {
-	FileSystem::getInstance().init( argc, argv );
+	SimulationPtr sim( new GLSimulation( "Textures", argc, argv ) );
 
-	float vertices[] = {
-		-1.0f, +1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		-1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-		+1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-		+1.0f, +1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f
-	};
-
-	unsigned short indices[] = {
-		0, 1, 2,
-		0, 2, 3
-	};
-
-	PrimitivePtr primitive( new Primitive( Primitive::Type::TRIANGLES ) );
-	primitive->setVertexBuffer( VertexBufferObjectPtr( new VertexBufferObject( VertexFormat::VF_P3_N3_UV2, 4, vertices ) ) );
-	primitive->setIndexBuffer( IndexBufferObjectPtr( new IndexBufferObject( 6, indices ) ) );
+	PrimitivePtr primitive( new SpherePrimitive( 1.0f, VertexFormat::VF_P3_UV2 ) );
 
 	GeometryNodePtr geometry( new GeometryNode() );
 	geometry->attachPrimitive( primitive );
-	geometry->local().setTranslate( 0.0f, 0.0f, -3.0f );
+	geometry->local().setTranslate( 0.0f, 0.0f, -2.0f );
 
 	MaterialPtr material( new Material() );
-	ImagePtr image( new ImageTGA( FileSystem::getInstance().pathForResource( "bricks.tga" ) ) );
+	ImagePtr image( new ImageTGA( FileSystem::getInstance().pathForResource( "earth-color.tga" ) ) );
 	TexturePtr texture( new Texture( image ) );
 	material->setColorMap( texture );
+	
 	MaterialComponentPtr materials( new MaterialComponent() );
 	materials->attachMaterial( material );
 	geometry->attachComponent( materials );
+
+	NodeComponentPtr rotation( new RotationComponent( Vector3f( 0.0f, 1.0f, 0.0f ), 1.0f / 60.0f ) );
+	geometry->attachComponent( rotation );
 
 	GroupNodePtr scene( new GroupNode() );
 	scene->attachNode( geometry );
@@ -68,7 +58,6 @@ int main( int argc, char **argv )
 	CameraNodePtr camera( new CameraNode() );
 	scene->attachNode( camera );
 
-	SimulationPtr sim( new GLSimulation( "Textures" ) );
 	sim->attachScene( scene );
 	return sim->run();
 }

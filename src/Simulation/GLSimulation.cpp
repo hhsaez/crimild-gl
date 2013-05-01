@@ -34,8 +34,8 @@
 
 using namespace Crimild;
 
-GLSimulation::GLSimulation( std::string name )
-	: Simulation( name )
+GLSimulation::GLSimulation( std::string name, int argc, char **argv )
+	: Simulation( name, argc, argv )
 {
 }
 

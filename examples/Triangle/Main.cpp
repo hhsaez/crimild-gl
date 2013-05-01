@@ -32,6 +32,8 @@ using namespace Crimild;
 
 int main( int argc, char **argv )
 {
+	SimulationPtr sim( new GLSimulation( "A simple example", argc, argv ) );
+
 	float vertices[] = {
 		-1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 		1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
@@ -62,7 +64,6 @@ int main( int argc, char **argv )
 	CameraNodePtr camera( new CameraNode() );
 	scene->attachNode( camera );
 
-	SimulationPtr sim( new GLSimulation( "test" ) );
 	sim->attachScene( scene );
 	return sim->run();
 }

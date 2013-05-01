@@ -45,7 +45,6 @@ WindowTask::~WindowTask( void )
 void WindowTask::start( void )
 {
 	FrameBufferObjectPtr screenBuffer( new FrameBufferObject( 1024, 768, 8, 8, 8, 8, 16, 0 ) );
-	screenBuffer->setClearColor( RGBAColorf( 0.5f, 0.5f, 0.5f, 1.0f ) );
 
 	glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );

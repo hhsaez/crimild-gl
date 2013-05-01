@@ -32,6 +32,8 @@ using namespace Crimild;
 
 int main( int argc, char **argv )
 {
+	SimulationPtr sim( new GLSimulation( "Default shapes", argc, argv ) );
+
 	GroupNodePtr scene( new GroupNode() );
 
 	GeometryNodePtr kleinBottle( new GeometryNode() );
@@ -65,7 +67,6 @@ int main( int argc, char **argv )
 	CameraNodePtr camera( new CameraNode() );
 	scene->attachNode( camera );
 
-	SimulationPtr sim( new GLSimulation( "test" ) );
 	sim->attachScene( scene );
 	return sim->run();
 }

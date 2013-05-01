@@ -32,6 +32,8 @@ using namespace Crimild;
 
 int main( int argc, char **argv )
 {
+	SimulationPtr sim( new GLSimulation( "The Infamus Teapot", argc, argv ) );
+	
 	GeometryNodePtr geometry( new GeometryNode() );
 	PrimitivePtr primitive( new NewellTeapotPrimitive() );
 	geometry->attachPrimitive( primitive );
@@ -45,7 +47,6 @@ int main( int argc, char **argv )
 	CameraNodePtr camera( new CameraNode() );
 	scene->attachNode( camera );
 
-	SimulationPtr sim( new GLSimulation( "The Infamus Teapot" ) );
 	sim->attachScene( scene );
 	return sim->run();
 }

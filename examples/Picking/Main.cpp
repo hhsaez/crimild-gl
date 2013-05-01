@@ -84,7 +84,7 @@ public:
 
 NodePtr makeSphere( float x, float y, float z )
 {
-	PrimitivePtr primitive( new SpherePrimitive( Primitive::Type::TRIANGLES, 1.0f ) );
+	PrimitivePtr primitive( new ParametricSpherePrimitive( Primitive::Type::TRIANGLES, 1.0f ) );
 	GeometryNodePtr geometry( new GeometryNode() );
 	geometry->attachPrimitive( primitive );
 
@@ -103,6 +103,8 @@ NodePtr makeSphere( float x, float y, float z )
 
 int main( int argc, char **argv )
 {
+	SimulationPtr sim( new GLSimulation( "Selecting objects with the mouse", argc, argv ) );
+
 	GroupNodePtr scene( new GroupNode() );
 
 	for ( float x = -5.0f; x <= 5.0f; x++ ) {
@@ -118,7 +120,6 @@ int main( int argc, char **argv )
 	camera->attachComponent( pickingComponent );
 	scene->attachNode( camera );
 
-	SimulationPtr sim( new GLSimulation( "Selecting objects with the mouse" ) );
 	sim->attachScene( scene );
 	return sim->run();
 }
