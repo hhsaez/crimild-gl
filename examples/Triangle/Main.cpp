@@ -54,14 +54,14 @@ int main( int argc, char **argv )
 	GeometryNodePtr geometry( new GeometryNode() );
 	geometry->attachPrimitive( primitive );
 
-	geometry->local().setTranslate( 0, 0, -3 );
 	RotationComponentPtr rotationComponent( new RotationComponent( Vector3f( 0, 1, 0 ), 0.5 ) );
 	geometry->attachComponent( rotationComponent );
 
 	GroupNodePtr scene( new GroupNode() );
 	scene->attachNode( geometry );
 
-	CameraNodePtr camera( new CameraNode() );
+	CameraPtr camera( new Camera() );
+	camera->local().setTranslate( 0.0f, 0.0f, 3.0f );
 	scene->attachNode( camera );
 
 	sim->attachScene( scene );

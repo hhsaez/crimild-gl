@@ -30,15 +30,31 @@
 
 using namespace Crimild;
 
-int main( int argc, char **argv )
+NodePtr buildBackground( float x, float y, float z ) 
 {
-	SimulationPtr sim( new GLSimulation( "Textures", argc, argv ) );
-
-	PrimitivePtr primitive( new SpherePrimitive( 1.0f, VertexFormat::VF_P3_UV2 ) );
-
+	PrimitivePtr primitive( new QuadPrimitive( 9.0f, 9.0f, VertexFormat::VF_P3_UV2 ) );
 	GeometryNodePtr geometry( new GeometryNode() );
 	geometry->attachPrimitive( primitive );
-	geometry->local().setTranslate( 0.0f, 0.0f, -2.0f );
+
+	MaterialPtr material( new Material() );
+	ImagePtr image( new ImageTGA( FileSystem::getInstance().pathForResource( "stars.tga" ) ) );
+	TexturePtr texture( new Texture( image ) );
+	material->setColorMap( texture );
+	
+	MaterialComponentPtr materials( new MaterialComponent() );
+	materials->attachMaterial( material );
+	geometry->attachComponent( materials );
+
+	geometry->local().setTranslate( x, y, z );
+
+	return geometry;	
+}
+
+NodePtr buildEarth( float x, float y, float z )
+{
+	PrimitivePtr primitive( new SpherePrimitive( 1.0f, VertexFormat::VF_P3_UV2 ) );
+	GeometryNodePtr geometry( new GeometryNode() );
+	geometry->attachPrimitive( primitive );
 
 	MaterialPtr material( new Material() );
 	ImagePtr image( new ImageTGA( FileSystem::getInstance().pathForResource( "earth-color.tga" ) ) );
@@ -52,10 +68,21 @@ int main( int argc, char **argv )
 	NodeComponentPtr rotation( new RotationComponent( Vector3f( 0.0f, 1.0f, 0.0f ), 1.0f / 60.0f ) );
 	geometry->attachComponent( rotation );
 
-	GroupNodePtr scene( new GroupNode() );
-	scene->attachNode( geometry );
+	geometry->local().setTranslate( x, y, z );
 
-	CameraNodePtr camera( new CameraNode() );
+	return geometry;
+}
+
+int main( int argc, char **argv )
+{
+	SimulationPtr sim( new GLSimulation( "Textures", argc, argv ) );
+
+	GroupNodePtr scene( new GroupNode() );
+	scene->attachNode( buildBackground( 0, 0, -5 ) );
+	scene->attachNode( buildEarth( 0.5, 0, 0 ) );
+
+	CameraPtr camera( new Camera() );
+	camera->local().setTranslate( 0.0f, 0.0f, 4.0f );
 	scene->attachNode( camera );
 
 	sim->attachScene( scene );

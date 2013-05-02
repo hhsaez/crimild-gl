@@ -42,9 +42,9 @@ int main( int argc, char **argv )
 
 	GroupNodePtr scene( new GroupNode() );
 	scene->attachNode( geometry );
-	scene->local().setTranslate( 0.0f, -10.0f, -100.0f );
 
-	CameraNodePtr camera( new CameraNode() );
+	CameraPtr camera( new Camera() );
+	camera->local().setTranslate( 0.0f, 10.0f, 100.0f );
 	scene->attachNode( camera );
 
 	sim->attachScene( scene );

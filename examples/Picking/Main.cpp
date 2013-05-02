@@ -45,20 +45,8 @@ public:
 
 	virtual void update( const Time &t ) override 
 	{
-		getNode()->getParent()->perform( SelectNodes( []( Node *node ) {
-			MaterialComponent *materials = node->getComponent< MaterialComponent >();
-			if ( materials ) {
-				materials->foreachMaterial( []( MaterialPtr &material ) {
-					material->setDiffuse( RGBAColorf( 0.75f, 0.75f, 0.75f, 1.0f ) );
-				});
-			}
-
-			return false;
-		}));
-
 		if ( InputState::getCurrentState().isMouseButtonDown( 0 ) ) {
-			CameraNode *cameraNode = static_cast< CameraNode * >( getNode() );
-			Camera *camera = cameraNode->getComponent< CameraComponent >()->getCamera();
+			Camera *camera = static_cast< Camera * >( getNode() );
 
 			Ray3f ray;
 			Vector2f mousePos = InputState::getCurrentState().getNormalizedMousePosition();
@@ -113,11 +101,11 @@ int main( int argc, char **argv )
 		}
 	}
 
-	scene->local().setTranslate( 0.0f, 0.0f, -50.0f );
-
-	CameraNodePtr camera( new CameraNode() );
+	CameraPtr camera( new Camera() );
 	NodeComponentPtr pickingComponent( new PickingComponent() );
 	camera->attachComponent( pickingComponent );
+	camera->local().setTranslate( 10.0f, 15.0f, 50.0f );
+	camera->local().setRotate( Vector3f( -1.0f, 0.5f, 0.0f ).getNormalized(), 0.1 * Numericf::PI );
 	scene->attachNode( camera );
 
 	sim->attachScene( scene );
