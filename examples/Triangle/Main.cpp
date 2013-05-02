@@ -51,13 +51,13 @@ int main( int argc, char **argv )
 	primitive->setVertexBuffer( vbo );
 	primitive->setIndexBuffer( ibo );
 
-	GeometryNodePtr geometry( new GeometryNode() );
+	GeometryPtr geometry( new Geometry() );
 	geometry->attachPrimitive( primitive );
 
 	RotationComponentPtr rotationComponent( new RotationComponent( Vector3f( 0, 1, 0 ), 0.5 ) );
 	geometry->attachComponent( rotationComponent );
 
-	GroupNodePtr scene( new GroupNode() );
+	GroupPtr scene( new Group() );
 	scene->attachNode( geometry );
 
 	CameraPtr camera( new Camera() );

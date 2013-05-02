@@ -116,7 +116,7 @@ void GL3::Renderer::enableMaterialProperties( ShaderProgram *program, Material *
 	}
 }
 
-void GL3::Renderer::applyTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera )
+void GL3::Renderer::applyTransformations( ShaderProgram *program, Geometry *geometry, Camera *camera )
 {
 	ShaderLocation *projMatrixLocation = program->getProjectionMatrixUniformLocation();
 	if ( projMatrixLocation && projMatrixLocation->isValid() ) {
@@ -179,7 +179,7 @@ void GL3::Renderer::drawPrimitive( ShaderProgram *program, Primitive *primitive 
 	CRIMILD_CHECK_GL_ERRORS_AFTER_CURRENT_FUNCTION;
 }
 
-void GL3::Renderer::restoreTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera )
+void GL3::Renderer::restoreTransformations( ShaderProgram *program, Geometry *geometry, Camera *camera )
 {
 
 }

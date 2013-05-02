@@ -47,11 +47,11 @@ namespace Crimild {
 
 			virtual void enableMaterialProperties( ShaderProgram *program, Material *material ) override;
 
-			virtual void applyTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera ) override;
+			virtual void applyTransformations( ShaderProgram *program, Geometry *geometry, Camera *camera ) override;
 
 			virtual void drawPrimitive( ShaderProgram *program, Primitive *primitive ) override;
 
-			virtual void restoreTransformations( ShaderProgram *program, GeometryNode *geometry, Camera *camera ) override;
+			virtual void restoreTransformations( ShaderProgram *program, Geometry *geometry, Camera *camera ) override;
 
 			virtual void disableMaterialProperties( ShaderProgram *program, Material *material ) override;
 

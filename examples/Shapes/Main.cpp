@@ -34,30 +34,30 @@ int main( int argc, char **argv )
 {
 	SimulationPtr sim( new GLSimulation( "Default shapes", argc, argv ) );
 
-	GroupNodePtr scene( new GroupNode() );
+	GroupPtr scene( new Group() );
 
-	GroupNodePtr shapes( new GroupNode() );
+	GroupPtr shapes( new Group() );
 	scene->attachNode( shapes );
 
-	GeometryNodePtr kleinBottle( new GeometryNode() );
+	GeometryPtr kleinBottle( new Geometry() );
 	PrimitivePtr kleinBottlePrimitive( new KleinBottlePrimitive( Primitive::Type::LINES, 0.1 ) );
 	kleinBottle->attachPrimitive( kleinBottlePrimitive );
 	kleinBottle->local().setTranslate( 0.0f, 0.0f, 3.0f );
 	shapes->attachNode( kleinBottle );
 
-	GeometryNodePtr mobiusStrip( new GeometryNode() );
+	GeometryPtr mobiusStrip( new Geometry() );
 	PrimitivePtr mobiusStripPrimitive( new MobiusStripPrimitive( Primitive::Type::LINES, 0.5f ) );
 	mobiusStrip->attachPrimitive( mobiusStripPrimitive );
 	mobiusStrip->local().setTranslate( 0.0f, 0.0f, -3.0f );
 	shapes->attachNode( mobiusStrip );
 
-	GeometryNodePtr torus( new GeometryNode() );
+	GeometryPtr torus( new Geometry() );
 	PrimitivePtr torusPrimitive( new TorusPrimitive( Primitive::Type::LINES, 1.0f, 0.25f ) );
 	torus->attachPrimitive( torusPrimitive );
 	torus->local().setTranslate( 3.0f, 0.0f, 0.0f );
 	shapes->attachNode( torus );
 
-	GeometryNodePtr trefoilKnot( new GeometryNode() );
+	GeometryPtr trefoilKnot( new Geometry() );
 	PrimitivePtr trefoilKnotPrimitive( new TrefoilKnotPrimitive( Primitive::Type::LINES, 1.0 ) );
 	trefoilKnot->attachPrimitive( trefoilKnotPrimitive );
 	trefoilKnot->local().setTranslate( -3.0f, 0.0f, 0.0f );

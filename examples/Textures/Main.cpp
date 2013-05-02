@@ -33,7 +33,7 @@ using namespace Crimild;
 NodePtr buildBackground( float x, float y, float z ) 
 {
 	PrimitivePtr primitive( new QuadPrimitive( 9.0f, 9.0f, VertexFormat::VF_P3_UV2 ) );
-	GeometryNodePtr geometry( new GeometryNode() );
+	GeometryPtr geometry( new Geometry() );
 	geometry->attachPrimitive( primitive );
 
 	MaterialPtr material( new Material() );
@@ -53,7 +53,7 @@ NodePtr buildBackground( float x, float y, float z )
 NodePtr buildEarth( float x, float y, float z )
 {
 	PrimitivePtr primitive( new SpherePrimitive( 1.0f, VertexFormat::VF_P3_UV2 ) );
-	GeometryNodePtr geometry( new GeometryNode() );
+	GeometryPtr geometry( new Geometry() );
 	geometry->attachPrimitive( primitive );
 
 	MaterialPtr material( new Material() );
@@ -77,7 +77,7 @@ int main( int argc, char **argv )
 {
 	SimulationPtr sim( new GLSimulation( "Textures", argc, argv ) );
 
-	GroupNodePtr scene( new GroupNode() );
+	GroupPtr scene( new Group() );
 	scene->attachNode( buildBackground( 0, 0, -5 ) );
 	scene->attachNode( buildEarth( 0.5, 0, 0 ) );
 
