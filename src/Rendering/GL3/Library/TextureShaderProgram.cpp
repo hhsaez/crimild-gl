@@ -64,14 +64,14 @@ const char *texture_fs = { CRIMILD_TO_STRING(
 TextureShaderProgram::TextureShaderProgram( void )
 	: ShaderProgram( Utils::getVertexShaderInstance( texture_vs ), Utils::getFragmentShaderInstance( texture_fs ) )
 { 
-	registerPositionAttributeLocation( "aPosition" );
-	registerTextureCoordAttributeLocation( "aTextureCoord" );
+	registerStandardLocation( ShaderLocation::Type::ATTRIBUTE, ShaderProgram::StandardLocation::POSITION_ATTRIBUTE, "aPosition" );
+	registerStandardLocation( ShaderLocation::Type::ATTRIBUTE, ShaderProgram::StandardLocation::TEXTURE_COORD_ATTRIBUTE, "aTextureCoord" );
 
-	registerProjectionMatrixUniformLocation( "uPMatrix" );
-	registerViewMatrixUniformLocation( "uVMatrix" );
-	registerModelMatrixUniformLocation( "uMMatrix" );
+	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::PROJECTION_MATRIX_UNIFORM, "uPMatrix" );
+	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::VIEW_MATRIX_UNIFORM, "uVMatrix" );
+	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::MODEL_MATRIX_UNIFORM, "uMMatrix" );
 
-	registerMaterialColorMapUniformLocation( "uColorMap" );
+	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::MATERIAL_COLOR_MAP_UNIFORM, "uColorMap" );
 }
 
 TextureShaderProgram::~TextureShaderProgram( void )

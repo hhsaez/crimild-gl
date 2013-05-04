@@ -32,23 +32,45 @@ using namespace Crimild;
 
 int main( int argc, char **argv )
 {
-	SimulationPtr sim( new GLSimulation( "The Infamus Teapot", argc, argv ) );
-	
-	GeometryPtr geometry( new Geometry() );
-	PrimitivePtr primitive( new NewellTeapotPrimitive() );
-	geometry->attachPrimitive( primitive );
-	RotationComponentPtr rotationComponent( new RotationComponent( Vector3f( 0, 1, 0 ), 0.25 ) );
-	geometry->attachComponent( rotationComponent );
+	SimulationPtr sim( new GLSimulation( "Lighting", argc, argv ) );
 
+	std::cout << "Press 1 to use Phong shading (default)\n"
+		  	  << "Press 2 to use Gouraud shading" << std::endl;
+
+	GeometryPtr trefoilKnot( new Geometry() );
+	PrimitivePtr trefoilKnotPrimitive( new TrefoilKnotPrimitive( Primitive::Type::TRIANGLES, 1.0, VertexFormat::VF_P3_N3 ) );
+	trefoilKnot->attachPrimitive( trefoilKnotPrimitive );
+	
+	NodeComponentPtr rotate( new RotationComponent( Vector3f( 0.0f, 1.0f, 0.0f ), 0.1f ) );
+	trefoilKnot->attachComponent( rotate );
+
+	MaterialPtr phongMaterial( new GL3::PhongMaterial() );
+	MaterialPtr gouraudMaterial( new GL3::GouraudMaterial() );
+	MaterialComponent *materials = trefoilKnot->getComponent< MaterialComponent >();
+
+	NodeComponentPtr changeMaterial( new LambdaComponent( [&]( Node *node, const Time & ) {
+		if ( InputState::getCurrentState().isKeyDown( '1' ) ) {
+			materials->detachAllMaterials();
+			materials->attachMaterial( phongMaterial );
+			node->perform( UpdateRenderState() );
+		}
+		else if ( InputState::getCurrentState().isKeyDown( '2' ) ) {
+			materials->detachAllMaterials();
+			materials->attachMaterial( gouraudMaterial );
+			node->perform( UpdateRenderState() );
+		}
+	}));
+	trefoilKnot->attachComponent( changeMaterial );
+	
 	GroupPtr scene( new Group() );
-	scene->attachNode( geometry );
+	scene->attachNode( trefoilKnot );
 
 	LightPtr light( new Light() );
-	light->local().setTranslate( -10.0f, 20.0f, 30.0f );
+	light->local().setTranslate( 0.0f, 1.0f, 3.0f );
 	scene->attachNode( light );
 
 	CameraPtr camera( new Camera() );
-	camera->local().setTranslate( 0.0f, 15.0f, 80.0f );
+	camera->local().setTranslate( 0.0f, 0.0f, 1.0f );
 	scene->attachNode( camera );
 
 	sim->attachScene( scene );

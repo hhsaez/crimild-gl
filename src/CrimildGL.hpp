@@ -35,6 +35,11 @@
 #include "Rendering/GL3/Utils.hpp"
 #include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
 
+#include "Rendering/GL3/Library/GouraudMaterial.hpp"
+#include "Rendering/GL3/Library/GouraudShaderProgram.hpp"
+#include "Rendering/GL3/Library/PhongMaterial.hpp"
+#include "Rendering/GL3/Library/PhongShaderProgram.hpp"
+
 #include "Simulation/GLSimulation.hpp"
 
 #endif

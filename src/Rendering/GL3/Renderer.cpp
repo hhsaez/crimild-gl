@@ -31,7 +31,9 @@
 #include "IndexBufferObjectCatalog.hpp"
 #include "TextureCatalog.hpp"
 #include "Library/FlatShaderProgram.hpp"
+#include "Library/GouraudShaderProgram.hpp"
 #include "Library/ColorShaderProgram.hpp"
+#include "Library/PhongShaderProgram.hpp"
 #include "Library/TextureShaderProgram.hpp"
 #include "Utils.hpp"
 
@@ -47,11 +49,9 @@ GL3::Renderer::Renderer( FrameBufferObjectPtr screenBuffer )
 	setIndexBufferObjectCatalog( IndexBufferObjectCatalogPtr( new GL3::IndexBufferObjectCatalog() ) );
 	setTextureCatalog( TextureCatalogPtr( new GL3::TextureCatalog() ) );
 
-	MaterialPtr material( new Material() );
-	material->setDiffuse( RGBAColorf( 1.0f, 0.0f, 1.0f, 1.0f ) );
-	setDefaultMaterial( material );
-
 	_fallbackPrograms[ "flat" ] = ShaderProgramPtr( new FlatShaderProgram() );
+	_fallbackPrograms[ "gouraud" ] = ShaderProgramPtr( new GouraudShaderProgram() );
+	_fallbackPrograms[ "phong" ] = ShaderProgramPtr( new PhongShaderProgram() );
 	_fallbackPrograms[ "color" ] = ShaderProgramPtr( new ColorShaderProgram() );
 	_fallbackPrograms[ "texture" ] = ShaderProgramPtr( new TextureShaderProgram() );
 
@@ -108,27 +108,92 @@ void GL3::Renderer::clearBuffers( void )
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
+void GL3::Renderer::enableLights( ShaderProgram *program, RenderStateComponent *renderState )
+{
+	if ( renderState->hasLights() ) {
+		ShaderLocation *lightCountLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_COUNT_UNIFORM );
+		if ( lightCountLocation && lightCountLocation->isValid() ) {
+			glUniform1i( lightCountLocation->getLocation(), 1 );
+		}
+	}
+
+	int i = 0;
+	renderState->foreachLight( [&]( Light *light ) {
+		ShaderLocation *lightPositionLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_POSITION_UNIFORM + i );
+		if ( lightPositionLocation ) {
+			glUniform3fv( lightPositionLocation->getLocation(), 1, static_cast< const float * >( light->getPosition() ) );
+		}
+
+		ShaderLocation *lightAttenuationLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_ATTENUATION_UNIFORM + i );
+		if ( lightAttenuationLocation ) {
+			glUniform3fv( lightAttenuationLocation->getLocation(), 1, static_cast< const float * >( light->getAttenuation() ) );
+		}
+
+		ShaderLocation *lightDirectionLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_DIRECTION_UNIFORM + i );
+		if ( lightDirectionLocation ) {
+			glUniform3fv( lightDirectionLocation->getLocation(), 1, static_cast< const float * >( light->getDirection() ) );
+		}
+
+		ShaderLocation *lightColorLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_COLOR_UNIFORM + i );
+		if ( lightColorLocation ) {
+			glUniform4fv( lightColorLocation->getLocation(), 1, static_cast< const float * >( light->getColor() ) );
+		}
+
+		ShaderLocation *lightOuterCutoffLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_OUTER_CUTOFF_UNIFORM + i );
+		if ( lightOuterCutoffLocation ) {
+			glUniform1f( lightOuterCutoffLocation->getLocation(), light->getOuterCutoff() );
+		}
+
+		ShaderLocation *lightInnerCutoffLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_INNER_CUTOFF_UNIFORM + i );
+		if ( lightInnerCutoffLocation ) {
+			glUniform1f( lightInnerCutoffLocation->getLocation(), light->getInnerCutoff() );
+		}
+
+		ShaderLocation *lightExponentLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_EXPONENT_UNIFORM + i );
+		if ( lightExponentLocation ) {
+			glUniform1f( lightExponentLocation->getLocation(), light->getExponent() );
+		}
+
+		i++;
+	});
+}
+
 void GL3::Renderer::enableMaterialProperties( ShaderProgram *program, Material *material )
 {
-	ShaderLocation *materialDiffuseLocation = program->getMaterialDiffuseUniformLocation();
+	ShaderLocation *materialAmbientLocation = program->getStandardLocation( ShaderProgram::StandardLocation::MATERIAL_AMBIENT_UNIFORM );
+	if ( materialAmbientLocation && materialAmbientLocation->isValid() ) {
+		glUniform4fv( materialAmbientLocation->getLocation(), 1, static_cast< const float * >( material->getAmbient() ) );
+	}
+
+	ShaderLocation *materialDiffuseLocation = program->getStandardLocation( ShaderProgram::StandardLocation::MATERIAL_DIFFUSE_UNIFORM );
 	if ( materialDiffuseLocation && materialDiffuseLocation->isValid() ) {
 		glUniform4fv( materialDiffuseLocation->getLocation(), 1, static_cast< const float * >( material->getDiffuse() ) );
+	}
+
+	ShaderLocation *materialSpecularLocation = program->getStandardLocation( ShaderProgram::StandardLocation::MATERIAL_SPECULAR_UNIFORM );
+	if ( materialSpecularLocation && materialSpecularLocation->isValid() ) {
+		glUniform4fv( materialSpecularLocation->getLocation(), 1, static_cast< const float * >( material->getSpecular() ) );
+	}
+
+	ShaderLocation *materialShininessLocation = program->getStandardLocation( ShaderProgram::StandardLocation::MATERIAL_SHININESS_UNIFORM );
+	if ( materialShininessLocation && materialShininessLocation->isValid() ) {
+		glUniform1f( materialShininessLocation->getLocation(), material->getShininess() );
 	}
 }
 
 void GL3::Renderer::applyTransformations( ShaderProgram *program, Geometry *geometry, Camera *camera )
 {
-	ShaderLocation *projMatrixLocation = program->getProjectionMatrixUniformLocation();
+	ShaderLocation *projMatrixLocation = program->getStandardLocation( ShaderProgram::StandardLocation::PROJECTION_MATRIX_UNIFORM );
 	if ( projMatrixLocation && projMatrixLocation->isValid() ) {
 		glUniformMatrix4fv( projMatrixLocation->getLocation(), 1, GL_FALSE, static_cast< const float * >( camera->getProjectionMatrix() ) );
 	}
 
-	ShaderLocation *viewMatrixLocation = program->getViewMatrixUniformLocation();
+	ShaderLocation *viewMatrixLocation = program->getStandardLocation( ShaderProgram::StandardLocation::VIEW_MATRIX_UNIFORM );
 	if ( viewMatrixLocation && viewMatrixLocation->isValid() ) {
 		glUniformMatrix4fv( viewMatrixLocation->getLocation(), 1, GL_FALSE, static_cast< const GLfloat * >( camera->getViewMatrix() ) );
 	}
 
-	ShaderLocation *modelMatrixLocation = program->getModelMatrixUniformLocation();
+	ShaderLocation *modelMatrixLocation = program->getStandardLocation( ShaderProgram::StandardLocation::MODEL_MATRIX_UNIFORM );
 	if ( modelMatrixLocation && modelMatrixLocation->isValid() ) {
 		Matrix4f modelMatrix = geometry->getWorld().computeModelMatrix();
 		glUniformMatrix4fv( modelMatrixLocation->getLocation(), 1, GL_FALSE, static_cast< const GLfloat * >( modelMatrix ) );
@@ -189,10 +254,19 @@ void GL3::Renderer::disableMaterialProperties( ShaderProgram *program, Material 
 
 }
 
-ShaderProgram *GL3::Renderer::getFallbackProgram( Material *material, Primitive *primitive )
+void GL3::Renderer::disableLights( ShaderProgram *program, RenderStateComponent *renderState )
+{
+	
+}
+
+ShaderProgram *GL3::Renderer::getFallbackProgram( Material *material, Geometry *geometry, Primitive *primitive )
 {
 	if ( material->getColorMap() ) {
 		return _fallbackPrograms[ "texture" ].get();
+	}
+
+	if ( geometry->getComponent< RenderStateComponent >()->hasLights() ) {
+		return _fallbackPrograms[ "phong" ].get();
 	}
 
 	if ( primitive->getVertexBuffer()->getVertexFormat().hasColors() ) {

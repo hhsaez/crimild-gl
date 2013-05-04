@@ -62,13 +62,13 @@ const char *flat_fs = { CRIMILD_TO_STRING(
 FlatShaderProgram::FlatShaderProgram( void )
 	: ShaderProgram( Utils::getVertexShaderInstance( flat_vs ), Utils::getFragmentShaderInstance( flat_fs ) )
 { 
-	registerPositionAttributeLocation( "aPosition" );
+	registerStandardLocation( ShaderLocation::Type::ATTRIBUTE, ShaderProgram::StandardLocation::POSITION_ATTRIBUTE, "aPosition" );
 
-	registerProjectionMatrixUniformLocation( "uPMatrix" );
-	registerViewMatrixUniformLocation( "uVMatrix" );
-	registerModelMatrixUniformLocation( "uMMatrix" );
+	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::PROJECTION_MATRIX_UNIFORM, "uPMatrix" );
+	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::VIEW_MATRIX_UNIFORM, "uVMatrix" );
+	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::MODEL_MATRIX_UNIFORM, "uMMatrix" );
 
-	registerMaterialDiffuseUniformLocation( "uMaterial.diffuse" );
+	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::MATERIAL_DIFFUSE_UNIFORM, "uMaterial.diffuse" );
 }
 
 FlatShaderProgram::~FlatShaderProgram( void )

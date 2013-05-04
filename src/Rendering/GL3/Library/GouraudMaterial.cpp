@@ -25,52 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ColorShaderProgram.hpp"
-#include "Rendering/GL3/Utils.hpp"
+#include "GouraudMaterial.hpp"
+#include "GouraudShaderProgram.hpp"
 
 using namespace Crimild;
 using namespace Crimild::GL3;
 
-const char *color_vs = { CRIMILD_TO_STRING(
-	in vec3 aPosition;
-	in vec4 aColor;
-
-	uniform mat4 uPMatrix; 
-	uniform mat4 uVMatrix; 
-	uniform mat4 uMMatrix;
-
-	out vec4 vColor;
-
-	void main()
-	{
-		vColor = aColor;
-		gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aPosition, 1.0); 
-	}
-)};
-
-const char *color_fs = { CRIMILD_TO_STRING( 
-	in vec4 vColor;
-
-	out vec4 vFragColor;
-
-	void main( void ) 
-	{ 
-		vFragColor = vColor;
-	}
-)};
-
-ColorShaderProgram::ColorShaderProgram( void )
-	: ShaderProgram( Utils::getVertexShaderInstance( color_vs ), Utils::getFragmentShaderInstance( color_fs ) )
-{ 
-	registerStandardLocation( ShaderLocation::Type::ATTRIBUTE, ShaderProgram::StandardLocation::POSITION_ATTRIBUTE, "aPosition" );
-	registerStandardLocation( ShaderLocation::Type::ATTRIBUTE, ShaderProgram::StandardLocation::COLOR_ATTRIBUTE, "aColor" );
-
-	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::PROJECTION_MATRIX_UNIFORM, "uPMatrix" );
-	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::VIEW_MATRIX_UNIFORM, "uVMatrix" );
-	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::MODEL_MATRIX_UNIFORM, "uMMatrix" );
+GouraudMaterial::GouraudMaterial( void )
+{
+	ShaderProgramPtr program( new GouraudShaderProgram() );
+	setProgram( program );
 }
 
-ColorShaderProgram::~ColorShaderProgram( void )
-{ 
+GouraudMaterial::~GouraudMaterial( void )
+{
+
 }
 

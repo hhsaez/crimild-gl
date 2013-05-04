@@ -88,7 +88,7 @@ void GL3::VertexBufferObjectCatalog::bind( ShaderProgram *program, VertexBufferO
 
 	    const VertexFormat &format = vbo->getVertexFormat();
 
-	    ShaderLocation *positionLocation = program->getPositionAttributeLocation();
+	    ShaderLocation *positionLocation = program->getStandardLocation( ShaderProgram::StandardLocation::POSITION_ATTRIBUTE );
 	    if ( positionLocation && positionLocation->isValid() ) {
 	        if ( format.hasPositions() ) {
 	            glEnableVertexAttribArray( positionLocation->getLocation() );
@@ -101,7 +101,20 @@ void GL3::VertexBufferObjectCatalog::bind( ShaderProgram *program, VertexBufferO
 	        }
 	    }
 
-	    ShaderLocation *colorLocation = program->getColorAttributeLocation();
+	    ShaderLocation *normalLocation = program->getStandardLocation( ShaderProgram::StandardLocation::NORMAL_ATTRIBUTE );
+	    if ( normalLocation && normalLocation->isValid() ) {
+	        if ( format.hasPositions() ) {
+	            glEnableVertexAttribArray( normalLocation->getLocation() );
+	            glVertexAttribPointer( normalLocation->getLocation(),
+	                                   format.getNormalComponents(),
+	                                   GL_FLOAT,
+	                                   GL_FALSE,
+	                                   format.getVertexSizeInBytes(),
+	                                   ( const GLvoid * )( baseOffset + format.getNormalsOffset() ) );
+	        }
+	    }
+
+	    ShaderLocation *colorLocation = program->getStandardLocation( ShaderProgram::StandardLocation::COLOR_ATTRIBUTE );
 	    if ( colorLocation && colorLocation->isValid() ) {
 	        if ( format.hasColors() ) {
 	            glEnableVertexAttribArray( colorLocation->getLocation() );
@@ -114,7 +127,7 @@ void GL3::VertexBufferObjectCatalog::bind( ShaderProgram *program, VertexBufferO
 	        }
 	    }
 
-	    ShaderLocation *uvLocation = program->getTextureCoordAttributeLocation();
+	    ShaderLocation *uvLocation = program->getStandardLocation( ShaderProgram::StandardLocation::TEXTURE_COORD_ATTRIBUTE );
 	    if ( uvLocation && uvLocation->isValid() ) {
 	        if ( format.hasTextureCoords() ) {
 	            glEnableVertexAttribArray( uvLocation->getLocation() );

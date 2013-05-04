@@ -45,6 +45,8 @@ namespace Crimild {
 			
 			virtual void clearBuffers( void ) override;
 
+			virtual void enableLights( ShaderProgram *program, RenderStateComponent *renderState ) override;
+
 			virtual void enableMaterialProperties( ShaderProgram *program, Material *material ) override;
 
 			virtual void applyTransformations( ShaderProgram *program, Geometry *geometry, Camera *camera ) override;
@@ -55,9 +57,11 @@ namespace Crimild {
 
 			virtual void disableMaterialProperties( ShaderProgram *program, Material *material ) override;
 
+			virtual void disableLights( ShaderProgram *program, RenderStateComponent *renderState ) override;
+
 			virtual void endRender( void ) override;
 
-			virtual ShaderProgram *getFallbackProgram( Material *material, Primitive *primitive ) override;
+			virtual ShaderProgram *getFallbackProgram( Material *material, Geometry *geometry, Primitive *primitive ) override;
 
 		private:
 			std::map< std::string, ShaderProgramPtr > _fallbackPrograms;
