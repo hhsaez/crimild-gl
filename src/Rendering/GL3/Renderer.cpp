@@ -110,13 +110,6 @@ void GL3::Renderer::clearBuffers( void )
 
 void GL3::Renderer::enableLights( ShaderProgram *program, RenderStateComponent *renderState )
 {
-	if ( renderState->hasLights() ) {
-		ShaderLocation *lightCountLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_COUNT_UNIFORM );
-		if ( lightCountLocation && lightCountLocation->isValid() ) {
-			glUniform1i( lightCountLocation->getLocation(), 1 );
-		}
-	}
-
 	int i = 0;
 	renderState->foreachLight( [&]( Light *light ) {
 		ShaderLocation *lightPositionLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_POSITION_UNIFORM + i );
@@ -156,6 +149,13 @@ void GL3::Renderer::enableLights( ShaderProgram *program, RenderStateComponent *
 
 		i++;
 	});
+
+	if ( renderState->hasLights() ) {
+		ShaderLocation *lightCountLocation = program->getStandardLocation( ShaderProgram::StandardLocation::LIGHT_COUNT_UNIFORM );
+		if ( lightCountLocation && lightCountLocation->isValid() ) {
+			glUniform1i( lightCountLocation->getLocation(), i );
+		}
+	}
 }
 
 void GL3::Renderer::enableMaterialProperties( ShaderProgram *program, Material *material )

@@ -25,70 +25,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Utils.hpp"
+#ifndef CRIMILD_GL3_LIBRARY_MATERIAL_FLAT_
+#define CRIMILD_GL3_LIBRARY_MATERIAL_FLAT_
 
-#include <GL/glew.h>
-#include <GL/glfw.h>
+#include <Crimild.hpp>
 
-#include <sstream>
+namespace Crimild {
 
-using namespace Crimild;
+	namespace GL3 {
 
-void GL3::Utils::checkErrors( std::string prefix )
-{
-    for ( GLint error = glGetError(); error; error = glGetError() ) {
+		class FlatMaterial : public Material {
+		public:
+			explicit FlatMaterial( const RGBAColorf &diffuse = RGBAColorf( 1.0f, 1.0f, 1.0f, 1.0f ) );
+			virtual ~FlatMaterial( void );
+		};
 
-    	std::string errorDescription;
-    	switch (error) {
-			case GL_INVALID_ENUM:
-				errorDescription += "GL_INVALID_ENUM";
-				break;
+	}
 
-			case GL_INVALID_VALUE:
-				errorDescription += "GL_INVALID_VALUE";
-				break;
-
-			case GL_INVALID_OPERATION:
-				errorDescription += "GL_INVALID_OPERATION";
-				break;
-
-			case GL_STACK_OVERFLOW:
-				errorDescription += "GL_STACK_OVERFLOW";  
-				break;
-
-			case GL_STACK_UNDERFLOW: 
-				errorDescription += "GL_STACK_UNDERFLOW";
-				break;
-
-			case GL_OUT_OF_MEMORY: 
-				errorDescription += "GL_OUT_OF_MEMORY";
-				break;
-
-			default:
-				errorDescription += "Unknown Error";
-				break;
-    	}
-
-    	Log::Error << prefix << ": " << "(0x" << error << ") " << errorDescription << " " << glewGetErrorString( error ) << Log::End; 
-    }
 }
 
-VertexShaderPtr GL3::Utils::getVertexShaderInstance( std::string source )
-{
-	VertexShaderPtr shader( new VertexShader( "#version 150\n" + source ) );
-	return shader;
-}
-
-FragmentShaderPtr GL3::Utils::getFragmentShaderInstance( std::string source )
-{
-	FragmentShaderPtr shader( new FragmentShader( "#version 150\n" + source ) );
-	return shader;
-}
-
-std::string GL3::Utils::buildArrayShaderLocationName( std::string variable, int index, std::string member )
-{
-	std::stringstream str;
-	str << variable << "[" << index << "]." << member;
-	return str.str();
-}
+#endif
 
