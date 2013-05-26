@@ -50,24 +50,20 @@ int GL3::TextureCatalog::getNextResourceId( void )
     return textureId;
 }
 
-void GL3::TextureCatalog::bind( ShaderProgram *program, Texture *texture )
+void GL3::TextureCatalog::bind( ShaderLocation *location, Texture *texture )
 {
+	if ( !texture ) {
+		return;
+	}
+
 	CRIMILD_CHECK_GL_ERRORS_BEFORE_CURRENT_FUNCTION;
 
-	Catalog< Texture >::bind( program, texture );
+	Catalog< Texture >::bind( location, texture );
 
-	ShaderLocation *textureLocation = nullptr;
-	if ( texture->getName() == "ColorMap" ) {
-		textureLocation = program->getStandardLocation( ShaderProgram::StandardLocation::MATERIAL_COLOR_MAP_UNIFORM );
-	}
-	else {
-		textureLocation = program->getLocation( texture->getName() );
-	}
-
-	if ( textureLocation && textureLocation->isValid() ) {
+	if ( location && location->isValid() ) {
 		glActiveTexture( GL_TEXTURE0 + _boundTextureCount );
 		glBindTexture( GL_TEXTURE_2D, texture->getCatalogId() );
-		glUniform1i( textureLocation->getLocation(), _boundTextureCount );
+		glUniform1i( location->getLocation(), _boundTextureCount );
 
 		++_boundTextureCount;
 	} 
@@ -75,8 +71,12 @@ void GL3::TextureCatalog::bind( ShaderProgram *program, Texture *texture )
 	CRIMILD_CHECK_GL_ERRORS_AFTER_CURRENT_FUNCTION;
 }
 
-void GL3::TextureCatalog::unbind( ShaderProgram *program, Texture *texture )
+void GL3::TextureCatalog::unbind( ShaderLocation *location, Texture *texture )
 {
+	if ( !texture ) {
+		return;
+	}
+	
 	CRIMILD_CHECK_GL_ERRORS_BEFORE_CURRENT_FUNCTION;
 
 	if ( _boundTextureCount > 0 ) {
@@ -85,7 +85,7 @@ void GL3::TextureCatalog::unbind( ShaderProgram *program, Texture *texture )
 		glBindTexture( GL_TEXTURE_2D, _boundTextureCount );
 	}
 	
-	Catalog< Texture >::unbind( program, texture );
+	Catalog< Texture >::unbind( location, texture );
 
 	CRIMILD_CHECK_GL_ERRORS_AFTER_CURRENT_FUNCTION;
 }

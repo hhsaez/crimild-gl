@@ -41,8 +41,8 @@ namespace Crimild {
 
 			virtual int getNextResourceId( void ) override;
 
-			virtual void bind( ShaderProgram *program, Texture *texture ) override;
-			virtual void unbind( ShaderProgram *program, Texture *texture ) override;
+			virtual void bind( ShaderLocation *location, Texture *texture ) override;
+			virtual void unbind( ShaderLocation *location, Texture *texture ) override;
 
 			virtual void load( Texture *texture ) override;
 			virtual void unload( Texture *texture ) override;

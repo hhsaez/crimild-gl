@@ -43,23 +43,18 @@ namespace Crimild {
 
 			virtual void beginRender( void ) override;
 			
+			virtual void endRender( void ) override;
+
 			virtual void clearBuffers( void ) override;
 
-			virtual void enableLights( ShaderProgram *program, RenderStateComponent *renderState ) override;
-
-			virtual void enableMaterialProperties( ShaderProgram *program, Material *material ) override;
-
-			virtual void applyTransformations( ShaderProgram *program, Geometry *geometry, Camera *camera ) override;
+		public:
+			virtual void bindUniform( ShaderLocation *location, int value ) override;
+			virtual void bindUniform( ShaderLocation *location, float value ) override;
+			virtual void bindUniform( ShaderLocation *location, const Vector3f &vector ) override;
+			virtual void bindUniform( ShaderLocation *location, const RGBAColorf &color ) override;
+			virtual void bindUniform( ShaderLocation *location, const Matrix4f &matrix ) override;
 
 			virtual void drawPrimitive( ShaderProgram *program, Primitive *primitive ) override;
-
-			virtual void restoreTransformations( ShaderProgram *program, Geometry *geometry, Camera *camera ) override;
-
-			virtual void disableMaterialProperties( ShaderProgram *program, Material *material ) override;
-
-			virtual void disableLights( ShaderProgram *program, RenderStateComponent *renderState ) override;
-
-			virtual void endRender( void ) override;
 
 			virtual ShaderProgram *getFallbackProgram( Material *material, Geometry *geometry, Primitive *primitive ) override;
 
