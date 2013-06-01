@@ -25,25 +25,48 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
-
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/OffscreenRenderPass.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
+#include "ScreenShaderProgram.hpp"
 #include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
 
-#include "Rendering/GL3/Library/FlatMaterial.hpp"
-#include "Rendering/GL3/Library/FlatShaderProgram.hpp"
-#include "Rendering/GL3/Library/GouraudMaterial.hpp"
-#include "Rendering/GL3/Library/GouraudShaderProgram.hpp"
-#include "Rendering/GL3/Library/PhongMaterial.hpp"
-#include "Rendering/GL3/Library/PhongShaderProgram.hpp"
+using namespace Crimild;
+using namespace Crimild::GL3;
 
-#include "Simulation/GLSimulation.hpp"
+const char *screen_vs = { CRIMILD_TO_STRING( 
+	in vec3 aPosition;
+	in vec2 aTextureCoord;
 
-#endif
+	out vec2 vTextureCoord;
+
+	void main()
+	{
+		vTextureCoord = aTextureCoord;
+		gl_Position = vec4( aPosition.x, aPosition.y, 0.0, 1.0 );
+	}
+)};
+
+const char *screen_fs = { CRIMILD_TO_STRING( 
+	in vec2 vTextureCoord;
+
+	uniform sampler2D uColorMap;
+
+	out vec4 vFragColor;
+
+	void main( void ) 
+	{ 
+		vFragColor = texture( uColorMap, vTextureCoord );
+	}
+)};
+
+ScreenShaderProgram::ScreenShaderProgram( void )
+	: ShaderProgram( Utils::getVertexShaderInstance( screen_vs ), Utils::getFragmentShaderInstance( screen_fs ) )
+{ 
+	registerStandardLocation( ShaderLocation::Type::ATTRIBUTE, ShaderProgram::StandardLocation::POSITION_ATTRIBUTE, "aPosition" );
+	registerStandardLocation( ShaderLocation::Type::ATTRIBUTE, ShaderProgram::StandardLocation::TEXTURE_COORD_ATTRIBUTE, "aTextureCoord" );
+
+	registerStandardLocation( ShaderLocation::Type::UNIFORM, ShaderProgram::StandardLocation::MATERIAL_COLOR_MAP_UNIFORM, "uColorMap" );
+}
+
+ScreenShaderProgram::~ScreenShaderProgram( void )
+{ 
+}
 

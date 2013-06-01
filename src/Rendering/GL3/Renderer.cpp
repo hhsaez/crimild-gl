@@ -29,11 +29,13 @@
 #include "ShaderProgramCatalog.hpp"
 #include "VertexBufferObjectCatalog.hpp"
 #include "IndexBufferObjectCatalog.hpp"
+#include "FrameBufferObjectCatalog.hpp"
 #include "TextureCatalog.hpp"
 #include "Library/FlatShaderProgram.hpp"
 #include "Library/GouraudShaderProgram.hpp"
 #include "Library/ColorShaderProgram.hpp"
 #include "Library/PhongShaderProgram.hpp"
+#include "Library/ScreenShaderProgram.hpp"
 #include "Library/TextureShaderProgram.hpp"
 #include "Utils.hpp"
 
@@ -47,12 +49,14 @@ GL3::Renderer::Renderer( FrameBufferObjectPtr screenBuffer )
 	setShaderProgramCatalog( ShaderProgramCatalogPtr( new GL3::ShaderProgramCatalog() ) );
 	setVertexBufferObjectCatalog( VertexBufferObjectCatalogPtr( new GL3::VertexBufferObjectCatalog() ) );
 	setIndexBufferObjectCatalog( IndexBufferObjectCatalogPtr( new GL3::IndexBufferObjectCatalog() ) );
+	setFrameBufferObjectCatalog( FrameBufferObjectCatalogPtr( new GL3::FrameBufferObjectCatalog( this ) ) );
 	setTextureCatalog( TextureCatalogPtr( new GL3::TextureCatalog() ) );
 
 	_fallbackPrograms[ "flat" ] = ShaderProgramPtr( new FlatShaderProgram() );
 	_fallbackPrograms[ "gouraud" ] = ShaderProgramPtr( new GouraudShaderProgram() );
 	_fallbackPrograms[ "phong" ] = ShaderProgramPtr( new PhongShaderProgram() );
 	_fallbackPrograms[ "color" ] = ShaderProgramPtr( new ColorShaderProgram() );
+	_fallbackPrograms[ "screen" ] = ShaderProgramPtr( new ScreenShaderProgram() );
 	_fallbackPrograms[ "texture" ] = ShaderProgramPtr( new TextureShaderProgram() );
 
 	setScreenBuffer( screenBuffer );
@@ -211,6 +215,10 @@ void GL3::Renderer::drawPrimitive( ShaderProgram *program, Primitive *primitive 
 
 ShaderProgram *GL3::Renderer::getFallbackProgram( Material *material, Geometry *geometry, Primitive *primitive )
 {
+	if ( material == nullptr || geometry == nullptr || primitive == nullptr ) {
+		return _fallbackPrograms[ "screen" ].get();
+	}
+
 	if ( material->getColorMap() ) {
 		return _fallbackPrograms[ "texture" ].get();
 	}

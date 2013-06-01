@@ -25,25 +25,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#ifndef CRIMILD_GL3_RENDER_PASS_OFFSCREEN_
+#define CRIMILD_GL3_RENDER_PASS_OFFSCREEN_
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/OffscreenRenderPass.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <Crimild.hpp>
 
-#include "Rendering/GL3/Library/FlatMaterial.hpp"
-#include "Rendering/GL3/Library/FlatShaderProgram.hpp"
-#include "Rendering/GL3/Library/GouraudMaterial.hpp"
-#include "Rendering/GL3/Library/GouraudShaderProgram.hpp"
-#include "Rendering/GL3/Library/PhongMaterial.hpp"
-#include "Rendering/GL3/Library/PhongShaderProgram.hpp"
+namespace Crimild {
 
-#include "Simulation/GLSimulation.hpp"
+	namespace GL3 {
+
+		class OffscreenRenderPass : public RenderPass {
+		public:
+			OffscreenRenderPass( void );
+			virtual ~OffscreenRenderPass( void );
+
+			virtual void render( Crimild::Renderer *renderer, VisibilitySet *vs, Camera *camera ) override;
+
+		private:
+			FrameBufferObjectPtr _offscreenBuffer;
+		};
+
+		typedef std::shared_ptr< OffscreenRenderPass > OffscreenRenderPassPtr;
+
+	}
+
+}
 
 #endif
 

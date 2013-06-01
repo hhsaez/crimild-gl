@@ -25,25 +25,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CRIMILD_GL_
-#define CRIMILD_GL_
+#ifndef CRIMILD_GL3_CATALOG_FRAME_BUFFER_OBJECT_
+#define CRIMILD_GL3_CATALOG_FRAME_BUFFER_OBJECT_
 
-#include "Rendering/GL3/IndexBufferObjectCatalog.hpp"
-#include "Rendering/GL3/Renderer.hpp"
-#include "Rendering/GL3/OffscreenRenderPass.hpp"
-#include "Rendering/GL3/ShaderProgramCatalog.hpp"
-#include "Rendering/GL3/TextureCatalog.hpp"
-#include "Rendering/GL3/Utils.hpp"
-#include "Rendering/GL3/VertexBufferObjectCatalog.hpp"
+#include <Crimild.hpp>
 
-#include "Rendering/GL3/Library/FlatMaterial.hpp"
-#include "Rendering/GL3/Library/FlatShaderProgram.hpp"
-#include "Rendering/GL3/Library/GouraudMaterial.hpp"
-#include "Rendering/GL3/Library/GouraudShaderProgram.hpp"
-#include "Rendering/GL3/Library/PhongMaterial.hpp"
-#include "Rendering/GL3/Library/PhongShaderProgram.hpp"
+namespace Crimild {
 
-#include "Simulation/GLSimulation.hpp"
+	namespace GL3 {
+
+		class FrameBufferObjectCatalog : public Catalog< FrameBufferObject > {
+		public:
+			FrameBufferObjectCatalog( Crimild::Renderer *renderer );
+			virtual ~FrameBufferObjectCatalog( void );
+
+			Crimild::Renderer *getRenderer( void ) { return _renderer; }
+
+			virtual int getNextResourceId( void ) override;
+
+			virtual void bind( FrameBufferObject *fbo ) override;
+			virtual void unbind( FrameBufferObject *fbo ) override;
+
+			virtual void load( FrameBufferObject *fbo ) override;
+			virtual void unload( FrameBufferObject *fbo ) override;
+
+		private:
+			Crimild::Renderer *_renderer;
+		};
+
+		typedef std::shared_ptr< FrameBufferObjectCatalog > FrameBufferObjectCatalogPtr;
+
+	}
+
+}
 
 #endif
 
