@@ -54,6 +54,9 @@ namespace Crimild {
 			virtual void bindUniform( ShaderLocation *location, const RGBAColorf &color ) override;
 			virtual void bindUniform( ShaderLocation *location, const Matrix4f &matrix ) override;
 
+			virtual void setDepthState( DepthState *state ) override;
+			virtual void setAlphaState( AlphaState *state ) override;
+
 			virtual void drawPrimitive( ShaderProgram *program, Primitive *primitive ) override;
 
 			virtual ShaderProgram *getFallbackProgram( Material *material, Geometry *geometry, Primitive *primitive ) override;

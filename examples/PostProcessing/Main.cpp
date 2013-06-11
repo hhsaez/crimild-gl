@@ -29,115 +29,17 @@
 #include <CrimildGL.hpp>
 
 using namespace Crimild;
-using namespace Crimild::GL3;
-
-/*
-
-class ImageEffect {
-public:
-	ImageEffect( void );
-	virtual ~ImageEffect( void );
-
-	void setEnabled( bool value ) { _enabled = value; }
-	bool isEnabled( void ) const { return _enabled; }
-
-	void setProgram( ShaderProgramPtr program ) { _program = program; }
-	ShaderProgram *getProgram( void ) { return _program; }
-
-	Primitive *getScreenPrimitive( void ) { return _screenPrimitive; }
-
-	virtual void render( Renderer *renderer, Texture *input )
-	{
-		renderer->bindProgram( getProgram() );
-		renderer->bindTexture( getProgram()->getStandardLocation( ShaderProgram::StandardLocations::INPUT_SAMPLER_UNIFORM ), input );
-
-		renderer->drawPrimitive( getScreenPrimitive() );
-
-		renderer->unbindTexture( getProgram()->getStandardLocation( ShaderProgram::StandardLocations::INPUT_SAMPLER_UNIFORM ), input );
-		renderer->unbindProgram( getProgram() );
-	}
-
-private:
-	bool _enabled;
-	PrimitivePtr _screenPrimitive;
-	ShaderProgramPtr _program;
-};
-
-class BlurImageEffect {
-public:
-	BlurImageEffect( void )
-		: _screen( new QuadPrimitive( 1.0, 1.0 ) )
-	{
-
-	}
-
-	virtual void render( Renderer *renderer, Texture *colorMap )
-	{
-		renderer->bindProgram( _program );
-		renderer->bindTexture( _program, colorMap );
-
-		for ( int i = 0; i < 2; i++ ) {
-			renderer->bindUniform( _program->getLocation( "pass" ), i )
-			renderer->drawPrimitive( _screen );
-		}
-
-		renderer->unbindTexture( _program, colorMap );
-		renderer->unbindProgram( _program );
-	}
-
-private:
-	PrimitivePtr _screen;
-};
-
-void OffscreenRenderPass::render( Renderer *renderer, VisibilitySet *vs, Camera *camera ) 
-{
-	renderer->bindFrameBuffer( _offscreenFrameBuffer.get() );
-	renderer->clearBuffers();
-	RenderPass::render( renderer, vs, camera );
-	renderer->unbindFrameBuffer( _offscreenFrameBuffer.get() );
-
-	if ( shallApplyResults() ) {
-		renderScreenBuffer( renderer );
-	}
-}
-
-void OffscreenRenderPass::renderScreenBuffer( Renderer *renderer ) 
-{
-	renderer->clearBuffers();
-	renderer->render( _screenPrimitive );
-}
-
-void OffscreenRenderPass::applyImageEffects( Renderer *renderer )
-{
-	if ( _postEffects.size() > 0 ) {
-		renderer->bindFrameBuffer( getOffscreenBuffer() );
-		for ( auto effect : _postEffects ) {
-			if ( effect->isEnabled() ) {
-				Texture *texture = getOffscreenBuffer()->getTexture();
-				renderer->clearBuffers();
-				effect->render( renderer, texture );
-			}
-		}
-		renderer->unbindFrameBuffer( getOffscreenBuffer() );
-	}
-}
-
-void OffscreenRenderPass::apply( Renderer *renderer )
-{
-
-}
-*/
 
 int main( int argc, char **argv )
 {
 	SimulationPtr sim( new GLSimulation( "Image effects", argc, argv ) );
-	
+
 	GroupPtr scene( new Group() );
 
 	GeometryPtr geometry( new Geometry() );
 	PrimitivePtr primitive( new NewellTeapotPrimitive() );
 	geometry->attachPrimitive( primitive );
-	RotationComponentPtr rotationComponent( new RotationComponent( Vector3f( 0, 1, 0 ), 0.25 ) );
+	RotationComponentPtr rotationComponent( new RotationComponent( Vector3f( 0.0f, 1.0f, 0.0f ), 0.25f ) );
 	geometry->attachComponent( rotationComponent );
 	scene->attachNode( geometry );
 
@@ -151,15 +53,12 @@ int main( int argc, char **argv )
 	
 	OffscreenRenderPassPtr renderPass( new OffscreenRenderPass() );
 	camera->setRenderPass( renderPass );
-	/*
-	RenderPass *renderPass = camera->getRenderPass();
-	SepiaToneEffectPtr sepiaTone( new SepiaToneEffect() ); 
-	renderPass->attachImageEffect( sepiaTone );
-	NoiseEffectPtr noiseEffect( new NoiseEffect() ); 
-	renderPass->attachImageEffect( noiseEffect );
-	ScratchEffectPtr scratchEffect( new ScratchEffect() ); 
-	renderPass->attachImageEffect( scratchEffect );
-	*/
+
+	ImageEffectPtr sepiaEffect( new ImageEffect() );
+	ShaderProgramPtr sepiaProgram( new GL3::SepiaToneShaderProgram() );
+	sepiaEffect->setProgram( sepiaProgram );
+	//sepiaEffect->setAlphaState( new AlphaState( true ) );
+	renderPass->attachImageEffect( sepiaEffect );
 
 	sim->attachScene( scene );
 	return sim->run();
